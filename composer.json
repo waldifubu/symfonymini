@@ -7,6 +7,7 @@
         "php": ">=8.1",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "gedmo/doctrine-extensions": "^3.9",
         "symfony/console": "6.1.*",
         "symfony/dotenv": "6.1.*",
         "symfony/flex": "^2",
@@ -15,6 +16,7 @@
         "symfony/yaml": "6.1.*"
     },
     "require-dev": {
+        "doctrine/doctrine-fixtures-bundle": "^3.4"
     },
     "config": {
         "allow-plugins": {

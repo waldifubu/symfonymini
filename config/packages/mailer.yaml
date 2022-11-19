@@ -1,3 +1,7 @@
 framework:
     mailer:
-        dsn: '%env(MAILER_DSN)%'
+        transports:
+            default: '%env(MAILER_DSN)%'
+            mailgun: '%env(MAILER_MAILGUN_URL)%'
+        envelope:
+            sender: 'notifications@example.com'

@@ -18,6 +18,7 @@ class SmsNotificationHandler
 
     public function __invoke(SmsNotification $message): void
     {
+        sleep(10);
         $this->logger->critical('WALDI: '.print_r($message, true),
             [
                 // include extra "context" info in your logs

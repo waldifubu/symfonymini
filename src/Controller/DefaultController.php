@@ -13,7 +13,9 @@ class DefaultController extends AbstractController
     #[Route('/message', name: 'app_default')]
     public function index(MessageBusInterface $bus): JsonResponse
     {
-        $bus->dispatch(new SmsNotification('Look! I created a message!'));
+        foreach (range(0, 999999) as $key ) {
+            $bus->dispatch(new SmsNotification('Look! I created a message! Index: '.$key));
+        }
 
         return $this->json([
             'message' => 'Welcome to your new controller!',

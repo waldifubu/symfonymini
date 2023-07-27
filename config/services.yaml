@@ -5,6 +5,9 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
 
+shapecode_cron:
+    timeout: 120 #null # default. A number (of type float) can be specified
+
 services:
     # default configuration for services in *this* file
     _defaults:

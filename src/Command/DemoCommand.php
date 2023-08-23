@@ -55,16 +55,21 @@ class DemoCommand extends Command
 
         $io->success('You have a new command! Now make it your own! Pass --help to see your options.');
         $this->insert();
+        sleep(10);
 
         $this->logger->info(date('H:i:s'). ' New call #######################################');
 
         return Command::SUCCESS;
     }
 
+    /**
+     * @throws \Exception
+     */
     private function insert(): void
     {
+        $min = random_int(0,59);
         $task = new Task();
-        $task->setSchedule('* * * * 37');
+        $task->setSchedule("* * * * ${min}");
         $this->entityManager->persist($task);
         $this->entityManager->flush();
     }

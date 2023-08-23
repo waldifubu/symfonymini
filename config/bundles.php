@@ -7,4 +7,5 @@ return [
     Doctrine\Bundle\MigrationsBundle\DoctrineMigrationsBundle::class => ['all' => true],
     Shapecode\Bundle\CronBundle\ShapecodeCronBundle::class => ['all' => true],
     Symfony\Bundle\MonologBundle\MonologBundle::class => ['all' => true],
+    Setono\CronExpressionBundle\SetonoCronExpressionBundle::class => ['all' => true],
 ];

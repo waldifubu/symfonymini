@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello IndexController!{% endblock %}
+
+{% block stylesheets %}
+    {{ vite_entry_link_tags('app') }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ vite_entry_script_tags('app', { dependency: 'react' }) }}
+{% endblock %}
+
+{% block body %}
+{#
+    {% if vite_mode() == 'dev' %}
+        DEV!
+    {% endif %}
+
+    {% if vite_mode() == 'prod' %}
+        PROD!
+    {% endif %}
+#}
+    <div id="root"></div>
+{% endblock %}
+
+

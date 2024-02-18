@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DoctrineMigrations;
 
+use Doctrine\DBAL\Platforms\MySQL80Platform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
@@ -20,7 +21,8 @@ final class Version20200129191810 extends AbstractMigration
     public function up(Schema $schema) : void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
+        $platform = $this->connection->getDatabasePlatform();
+        $this->abortIf(!$platform instanceof MySQL80Platform, 'Migration can only be executed safely on \'mysql\'.');
 
         $this->addSql('ALTER TABLE todo ADD description VARCHAR(500) NOT NULL');
     }

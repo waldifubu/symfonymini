@@ -10,7 +10,8 @@ export default defineConfig({
     build: {
         rollupOptions: {
             input: {
-                app: './frontend/index.jsx'
+                app: './frontend/index.jsx',
+                project: './frontend/project.jsx'
             },
         }
     },

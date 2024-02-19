@@ -3,14 +3,16 @@
 {% block title %}Hello IndexController!{% endblock %}
 
 {% block stylesheets %}
-    {{ vite_entry_link_tags('app') }}
+    {{ vite_entry_link_tags('project') }}
 {% endblock %}
 
 {% block javascripts %}
-    {{ vite_entry_script_tags('app', { dependency: 'react' }) }}
+    {{ vite_entry_script_tags('project', { dependency: 'react' }) }}
 {% endblock %}
 
 {% block body %}
+{#    SPA!!!#}
+{#    {{ dump(app) }}#}
 {#
 
     {% if vite_mode() == 'dev' %}

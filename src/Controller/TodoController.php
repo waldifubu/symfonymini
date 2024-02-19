@@ -26,7 +26,7 @@ class TodoController extends AbstractController
     #[Route('/', name: 'app_index')]
     public function index(): Response
     {
-        return $this->render('todo/todo.html.twig', [
+        return $this->render('todo/spa.html.twig', [
             'controller_name' => 'IndexController',
         ]);
     }

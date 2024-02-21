@@ -1,9 +1,6 @@
-import React, {StrictMode, Suspense} from 'react';
+import {StrictMode, Suspense, lazy} from 'react';
 import {createRoot} from "react-dom/client";
 import {
-    BrowserRouter,
-    Routes,
-    Route,
     createBrowserRouter, RouterProvider,
 } from "react-router-dom";
 import {HelmetProvider} from "react-helmet-async";
@@ -14,10 +11,10 @@ import 'bootstrap/dist/js/bootstrap.min';
 import Loading from "./components/Loading.jsx";
 import NotFound from "./pages/NotFound.jsx";
 
-const ProjectList = React.lazy(() => import("./pages/ProjectList.jsx"));
-const ProjectCreate = React.lazy(() => import ("./pages/ProjectCreate.jsx"));
-const ProjectEdit = React.lazy(() => import("./pages/ProjectEdit.jsx"));
-const ProjectShow = React.lazy(() => import ("./pages/ProjectShow.jsx"));
+const ProjectList = lazy(() => import("./pages/ProjectList.jsx"));
+const ProjectCreate = lazy(() => import ("./pages/ProjectCreate.jsx"));
+const ProjectEdit = lazy(() => import("./pages/ProjectEdit.jsx"));
+const ProjectShow = lazy(() => import ("./pages/ProjectShow.jsx"));
 const helmetContext = {};
 
 /*
@@ -64,7 +61,6 @@ function Main() {
         </>
     );
 }
-
 
 createRoot(document.getElementById('root')).render(
     <StrictMode>

@@ -1,11 +1,8 @@
-import React from "react";
+import './Loading.css';
 
-function Loading() {
+export default function Loading() {
+
     return (
-        <div style={{textAlign: 'center', marginTop: '10%'}}>
-            <h2>LOADING ...</h2>
-        </div>
+        <h2 className="loading">LOADING</h2>
     )
 }
-
-export default Loading;

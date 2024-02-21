@@ -3,6 +3,7 @@ import {Link, Outlet} from "react-router-dom";
 import Layout from "../components/Layout.jsx"
 import Swal from 'sweetalert2'
 import axios from 'axios';
+import Loading from "../components/Loading.jsx";
 
 function ProjectList() {
     const [projectList, setProjectList] = useState([])

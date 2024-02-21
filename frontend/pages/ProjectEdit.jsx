@@ -3,6 +3,7 @@ import {Link, useParams, useNavigate} from "react-router-dom";
 import Layout from "../components/Layout"
 import Swal from 'sweetalert2'
 import axios from 'axios';
+import Loading from "../components/Loading.jsx";
 
 function ProjectEdit() {
     const [id, setId] = useState('')
@@ -72,7 +73,9 @@ function ProjectEdit() {
     return (
         <Layout seo={metadata}>
             <div className="container">
-                <h2 className="text-center mt-5 mb-3">Edit Project</h2>
+                <h2 className="text-center mt-5 mb-3">
+                    {name === "" ? <Loading/> : <span>Edit Project &quot;{name}&quot;</span>}
+                </h2>
                 <div className="card">
                     <div className="card-header">
                         <Link

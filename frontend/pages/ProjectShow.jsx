@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {Link, useParams} from "react-router-dom";
 import Layout from "../components/Layout"
 import axios from 'axios';
+import Loading from "../components/Loading.jsx";
 
 function ProjectShow() {
     const [id, setId] = useState(useParams().slug)
@@ -24,7 +25,9 @@ function ProjectShow() {
     return (
         <Layout seo={metaData}>
             <div className="container">
-                <h2 className="text-center mt-5 mb-3">Show Project details &quot;{project.name}&quot;</h2>
+                <h2 className="text-center mt-5 mb-3">
+                    {project.name === "" ? <Loading/> : <span>Show Project details &quot;{project.name}&quot;</span>}
+                </h2>
                 <div className="card">
                     <div className="card-header">
                         <Link

@@ -13,6 +13,7 @@
         "symfony/console": "7.0.*",
         "symfony/dotenv": "7.0.*",
         "symfony/flex": "^2.4.4",
+        "symfony/form": "7.0.*",
         "symfony/framework-bundle": "7.0.*",
         "symfony/mercure-bundle": "^0.3.8",
         "symfony/proxy-manager-bridge": "^6.4.3",

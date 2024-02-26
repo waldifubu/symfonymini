@@ -12,6 +12,7 @@ use App\Service\CookieGenerator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -25,18 +26,10 @@ use Symfony\Component\Uid\Uuid;
 #[Route(path: '/messages', name: 'messages_')]
 class MessageController extends AbstractController
 {
-
-    /**
-     * @var UserRepository
-     */
-    private $userRepository;
-
     public function __construct(private MessageRepository      $messageRepository,
-                                UserRepository                 $userRepository,
-                                private EntityManagerInterface $em,
-                                private Security               $security)
+                                private EntityManagerInterface $em,)
     {
-        $this->userRepository = $userRepository;
+
     }
 
     //BREAD controller action pattern
@@ -134,7 +127,7 @@ class MessageController extends AbstractController
      * Ping mercure
      */
     #[Route(path: '/{id}/ping', name: 'ping')]
-    public function ping(Request $request, HubInterface $hub)
+    public function ping(Request $request, HubInterface $hub): RedirectResponse
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
 

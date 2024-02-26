@@ -24,8 +24,8 @@ services:
     # please note that last definitions always *replace* previous ones
     App\Service\JWTprovider:
         arguments:
-            - '%env(MERCURE_JWT_KEY)%'
+            - '%env(MERCURE_JWT_SECRET)%'
             - '@security.token_storage'
     App\Service\CookieGenerator:
         arguments:
-            $secret: '%env(MERCURE_JWT_KEY)%'
+            $secret: '%env(MERCURE_JWT_SECRET)%'

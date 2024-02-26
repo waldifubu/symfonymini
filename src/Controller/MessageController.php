@@ -27,33 +27,16 @@ class MessageController extends AbstractController
 {
 
     /**
-     * @var MessageRepository
-     */
-    private MessageRepository $messageRepository;
-    /**
      * @var UserRepository
      */
     private $userRepository;
 
-    /**
-     * @var EntityManagerInterface
-     */
-    private EntityManagerInterface $em;
-
-    /**
-     * @var Security
-     */
-    private Security $security;
-
-    public function __construct(MessageRepository      $messageRepository,
-                                UserRepository         $userRepository,
-                                EntityManagerInterface $em,
-                                Security               $security)
+    public function __construct(private MessageRepository      $messageRepository,
+                                UserRepository                 $userRepository,
+                                private EntityManagerInterface $em,
+                                private Security               $security)
     {
-        $this->messageRepository = $messageRepository;
         $this->userRepository = $userRepository;
-        $this->em = $em;
-        $this->security = $security;
     }
 
     //BREAD controller action pattern

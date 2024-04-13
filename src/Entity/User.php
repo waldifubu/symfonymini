@@ -6,7 +6,6 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\PersistentCollection;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -31,14 +30,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'array')]
     private array $roles = ['ROLE_USER'];
 
-    #[ORM\OneToMany(targetEntity: Message::class, mappedBy: 'user', orphanRemoval: true, cascade: ['persist'])]
-    private PersistentCollection  $messages;
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Message::class, cascade: ['persist'], orphanRemoval: true)]
+    private Collection $messages;
 
     #[ORM\ManyToMany(targetEntity: GroupConversation::class, inversedBy: 'users', cascade: ['persist'])]
-    private PersistentCollection  $conversations;
+    private Collection $conversations;
 
-    #[ORM\OneToMany(targetEntity: GroupConversation::class, mappedBy: 'admin', cascade: ['persist'])]
-    private PersistentCollection  $adminGroupConversations;
+    #[ORM\OneToMany(mappedBy: 'admin', targetEntity: GroupConversation::class, cascade: ['persist'])]
+    private Collection $adminGroupConversations;
 
     #[ORM\Column(type: 'boolean')]
     private ?bool $status;
@@ -52,12 +51,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $activationToken;
 
-
     public function __construct()
     {
-        $this->messages                 = new PersistentCollection ();
-        $this->conversations            = new PersistentCollection ();
-        $this->adminGroupConversations  = new PersistentCollection ();
+        $this->messages = new ArrayCollection();
+        $this->conversations = new ArrayCollection();
+        $this->adminGroupConversations = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -116,9 +114,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * @return Collection
-     */
     public function getMessages(): Collection
     {
         return $this->messages;
@@ -144,9 +139,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * @return Collection
-     */
     public function getConversations(): Collection
     {
         return $this->conversations;
@@ -168,9 +160,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * @return Collection
-     */
     public function getAdminGroupConversations(): Collection
     {
         return $this->adminGroupConversations;

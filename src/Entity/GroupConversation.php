@@ -16,16 +16,16 @@ class GroupConversation
     private $id;
 
     #[ORM\Column(type: 'string', length: 255)]
-    private $name;
+    private ?string $name;
 
-    #[ORM\OneToMany(targetEntity: Message::class, mappedBy: 'conversation', cascade: ['persist'])]
+    #[ORM\OneToMany(mappedBy: 'conversation', targetEntity: Message::class, cascade: ['persist'])]
     private $messages;
 
-    #[ORM\Column(type: 'datetimetz')]
-    private $created;
+    #[ORM\Column(type: 'datetime')]
+    private ?\DateTimeInterface $created;
 
-    #[ORM\Column(type: 'datetimetz')]
-    private $updated;
+    #[ORM\Column(type: 'datetime')]
+    private ?\DateTimeInterface $updated;
 
     #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'conversations', cascade: ['persist'])]
     private $users;
@@ -39,7 +39,7 @@ class GroupConversation
     public function __construct()
     {
         $this->messages = new ArrayCollection();
-        $this->users    = new ArrayCollection();
+        $this->users = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -60,7 +60,7 @@ class GroupConversation
     }
 
     /**
-     * @return Collection|Message[]
+     * @return Collection
      */
     public function getMessages(): Collection
     {

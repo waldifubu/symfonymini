@@ -4,7 +4,6 @@ namespace App\Entity;
 
 use App\Repository\MessageRepository;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: MessageRepository::class)]
@@ -16,31 +15,30 @@ class Message
     private $id;
 
     #[ORM\Column(type: 'text')]
-    private $content;
+    private ?string $content;
 
     #[ORM\Column(type: 'boolean')]
-    private $seen;
+    private ?bool $seen;
 
     #[ORM\ManyToOne(targetEntity: GroupConversation::class, cascade: ['persist'], inversedBy: 'messages')]
     private $conversation;
 
     #[ORM\Column(type: 'datetimetz')]
-    private $created;
+    private ?\DateTimeInterface $created;
 
     #[ORM\Column(type: 'datetimetz')]
-    private $updated;
+    private ?\DateTimeInterface $updated;
 
     #[ORM\JoinColumn(nullable: false)]
     #[ORM\ManyToOne(targetEntity: User::class, cascade: ['persist'], inversedBy: 'messages')]
     private $user;
 
-    private $mine;
+    private ?bool $mine;
 
     public function __construct()
     {
         $this->user = new ArrayCollection();
     }
-
 
     public function getId(): ?int
     {
@@ -52,21 +50,16 @@ class Message
         return $this->content;
     }
 
-    /**
-     * @return mixed
-     */
     public function getMine()
     {
         return $this->mine;
     }
 
-    /**
-     * @param mixed $mine
-     */
     public function setMine($mine): void
     {
         $this->mine = $mine;
     }
+
     public function setContent(string $content): self
     {
         $this->content = $content;
@@ -133,5 +126,4 @@ class Message
 
         return $this;
     }
-
 }

@@ -7,7 +7,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\Security\Http\Authenticator\AbstractLoginFormAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge;
@@ -20,20 +19,21 @@ class AppAuthenticator extends AbstractLoginFormAuthenticator
 {
     use TargetPathTrait;
 
-    public const LOGIN_ROUTE = 'app_login';
+    public const string LOGIN_ROUTE = 'app_login';
 
-    public function __construct(private UrlGeneratorInterface $urlGenerator,
-                private AuthenticationUtils $authenticationUtils)
+    public function __construct(
+        private readonly UrlGeneratorInterface $urlGenerator,
+        private readonly AuthenticationUtils $authenticationUtils)
     {
     }
 
     public function authenticate(Request $request): Passport
     {
-        $password   = $request->request->get('password', '');
-        $email      = $request->request->get('mail', '');
+        $password = $request->request->get('password', '');
+        $email = $request->request->get('mail', '');
 
-//        var_dump($request->request);
-//        exit;
+        //        var_dump($request->request);
+        //        exit;
 
         $request->getSession()->set($this->authenticationUtils->getLastUsername(), $email);
 

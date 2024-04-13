@@ -3,16 +3,15 @@
 {% block body %}
     {% if app.user %}
         <div class="connected-user">
-            <p>Connecté en tant que : {{ app.user.getUsername }} <a class="btn btn-danger"
-                                                                    href="{{ path("app_logout") }}">Déconnexion</a></p>
+            <p>Connecté en tant que : {{ app.user.getUsername }}
+                <a class="btn btn-danger" href="{{ path("app_logout") }}">Logout</a></p>
         </div>
     {% endif %}
     <div class="messages-list col-12">
         <div class="container my-3">
             {% if conversation is defined %}
-                <a class="btn btn-primary" href="{{ path("conversation_browse") }}">Liste des Conversations</a>
-                <a class="btn btn-success" href="{{ path("messages_ping", {'id' : conversation.id}) }}">Ping Mercure
-                    (EventSource)</a>
+                <a class="btn btn-primary" href="{{ path("conversation_browse") }}">List of conversations</a>
+                <a class="btn btn-success" href="{{ path("messages_ping", {'id' : conversation.id}) }}">Ping Mercure (EventSource)</a>
                 <h2>Conversation : {{ conversation.name }}</h2>
                 {% if conversation.admin.getId == app.user.getId %}
                     <a class="btn btn-danger" href="{{ path("conversation_delete", {'id' : conversation.id}) }}">supprimer</a>
@@ -96,11 +95,6 @@
         /**
          * autoscroll bottom
          */
-        function autoBottomScroll2() {
-            const objDiv = document.querySelector(".conversation");
-            objDiv.scrollIntoView({block: "end", inline: "nearest"});
-        }
-
         function autoBottomScroll() {
             const elementId = 'bottom';
             const scrollIntoViewOptions = {behavior: "smooth", block: "center"};
@@ -145,6 +139,21 @@
                     withCredentials: true //send cookies by browser
                 });
 
+                const newUrl = new URL(hubUrl);
+                newUrl.searchParams.append('topic', '/ping/2');
+                const eventSource2 = new EventSource(newUrl, {
+                    withCredentials: false //send cookies by browser
+                });
+
+
+                if (typeof (eventSource2 !== undefined)) {
+
+                    eventSource2.onmessage = (event) => {
+                        console.log("PING!!!!");
+                        console.log(event);
+                    }
+                }
+
                 if (typeof (eventSource !== undefined)) {
                     eventSource.onmessage = (event) => {
                         console.log("Nachricht erhalten");
@@ -173,9 +182,10 @@
                 }
             });
 
+            autoBottomScroll();
         });
 
-        // Graue nachrichten
+        // Grey messages
         function sendMessage(data) {
             if (data === "")
                 return;
@@ -191,7 +201,8 @@
                 method: 'POST',
                 body: formData
             }).then(result => {
-                // console.log(formData);
+                 // console.log(formData);
+                 // console.log(result);
                 // update chat-message
                 let newMessageHTML =
                     '<div class="chat--message">' +

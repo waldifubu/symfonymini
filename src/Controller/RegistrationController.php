@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\UserType;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,15 +21,14 @@ class RegistrationController extends AbstractController
     }
 
     #[Route('/register', name: 'registration')]
-    public function add(Request $request): Response
+    public function add(Request $request, EntityManagerInterface $entityManager): Response
     {
-        $user   = new User();
-        $form   = $this->createForm(UserType::class, $user);
+        $user = new User();
+        $form = $this->createForm(UserType::class, $user);
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-
             // Encode the new users password
             // hash the password (based on the security.yaml config for the $user class)
             $hashedPassword = $this->passwordHasher->hashPassword(
@@ -37,16 +37,17 @@ class RegistrationController extends AbstractController
             );
             $user->setPassword($hashedPassword);
 
-            //set user status : 1 = activated
+            // set user status : 1 = activated
             $user->setStatus(1);
             $user->setCreatedAt(new \DateTimeImmutable());
             $user->setUpdatedAt(new \DateTimeImmutable());
 
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($user);
-            $em->flush();
+
+            $entityManager->persist($user);
+            $entityManager->flush();
 
             $this->addFlash('success', 'Votre compte est créé 😉');
+
             return $this->redirectToRoute('app_login');
         }
 

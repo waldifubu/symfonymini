@@ -32,6 +32,7 @@ class GroupConversationController extends AbstractController
      * Display list of conversations
      *
      * @param GroupConversationRepository $groupConversationRepository
+     * @param CookieGenerator|null $cookieGenerator
      * @return Response
      */
     #[Route(path: '/', name: 'conversation_browse')]
@@ -40,6 +41,7 @@ class GroupConversationController extends AbstractController
         $this->denyAccessUnlessGranted('ROLE_USER');
 
         $conversations = $groupConversationRepository->findAll();
+
         $cookie = $cookieGenerator->generate();
         $response = $this->render('conversation/browse.html.twig', [
             'conversations' => $conversations,

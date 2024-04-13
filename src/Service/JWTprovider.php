@@ -11,6 +11,7 @@ use Lcobucci\JWT\Signer\Key\InMemory;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Mercure\Jwt\TokenProviderInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
 
 class JWTprovider implements TokenProviderInterface
@@ -19,47 +20,48 @@ class JWTprovider implements TokenProviderInterface
     /**
      * @var string
      */
-    private $secret;
+    private string $secret;
 
-    private $tokenStorage;
+    private TokenStorageInterface $tokenStorage;
 
-    private $em;
+    private EntityManagerInterface $em;
 
     /**
      * @var Security
      */
     private Security $security;
 
-    public function __construct(string $secret,
-                                TokenStorageInterface $tokenStorage,
+    public function __construct(string                 $secret,
+                                TokenStorageInterface  $tokenStorage,
                                 EntityManagerInterface $em,
-                                Security $security)
+                                Security               $security)
     {
-        $this->secret       = $secret;
+        $this->secret = $secret;
         $this->tokenStorage = $tokenStorage;
-        $this->em           = $em;
-        $this->security     = $security;
+        $this->em = $em;
+        $this->security = $security;
     }
 
     public function getJwt(): string
     {
-        $subscribe = [];
-
         $user = $this->security->getUser();
 
-        if($user instanceof \Symfony\Component\Security\Core\User\UserInterface) {
+        if ($user instanceof UserInterface) {
             $conversations = $user->getConversations()->getValues();
             //save all sub/pub conversations
-            if($conversations) {
-                foreach ($conversations as $conversation) {
-                    $subscribe[] =  '/messages/' . $conversation->getId();
-                }
+            $subscribe = [];
+
+            foreach ($conversations as $conversation) {
+                $subscribe[] = '/messages/' . $conversation->getId();
             }
 
             $subscribe[] = '/ping/{id}';
+            $subscribe[] = '/ping/1';
+            $subscribe[] = '/ping/2';
+            $subscribe[] = '/ping/3';
 
             $config = Configuration::forSymmetricSigner(new Sha256(), InMemory::plainText($this->secret));
-            $token  = $config->builder()
+            $token = $config->builder()
                 ->withClaim('mercure', [
                     'subscribe' => $subscribe,
                     'publish' => $subscribe
@@ -67,7 +69,8 @@ class JWTprovider implements TokenProviderInterface
                 // Builds a new token
                 ->getToken($config->signer(), $config->signingKey());
 
-            //dd( $token->toString());
+//            dd($config);
+//            dd( $token->toString());
             return $token->toString();
         }
         return "";

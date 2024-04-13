@@ -13,28 +13,28 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class UserType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('username',TextType::class, [
+            ->add('username', TextType::class, [
                 'label' => false,
             ])
             ->add('mail', EmailType::class,
                 [
-                    'label'     => false,
-                    'required'  => true,
+                    'label' => false,
+                    'required' => true,
                 ]
             )
             ->add('password', RepeatedType::class, [
-                'type'      => PasswordType::class,
-                'required'  => true,
+                'type' => PasswordType::class,
+                'required' => true,
                 'invalid_message' => 'Les mots de passe ne sont pas correspondants.',
                 'first_options' => ['label' => false],
                 'second_options' => ['label' => false]
             ]);
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => User::class,

@@ -6,3 +6,13 @@ mercure:
             jwt:
                 secret: '%env(MERCURE_JWT_SECRET)%'
                 publish: '*'
+
+#                secret: '!ChangeThisMercureHubJWTSecretKey!'
+#                publish: [ 'foo', 'https://example.com/foo' ]
+#                subscribe: [ 'bar', 'http://example.com/bar' ]
+                subscribe: '*' # allow all
+                algorithm: 'hmac.sha256'
+#                provider: 'My\Provider'
+                provider: 'App\Service\JWTprovider'
+#                factory: 'My\Factory'
+#                value: 'my.jwt'

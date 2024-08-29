@@ -38,6 +38,9 @@ services:
       # - ./docker/db/data:/var/lib/postgresql/data:rw
 ###< doctrine/doctrine-bundle ###
 
+#  nginx:
+
+
 volumes:
 ###> symfony/mercure-bundle ###
   mercure_data:

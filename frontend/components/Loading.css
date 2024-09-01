@@ -1,8 +1,6 @@
 h2.loading {
     color: #222;
-    /*font: 300 3em Impact;*/
     text-align: center;
-    margin-top: 10%;
 }
 
 .loading:after {

@@ -1,8 +1,6 @@
 import {StrictMode, Suspense, lazy} from 'react';
 import {createRoot} from "react-dom/client";
-import {
-    createBrowserRouter, RouterProvider,
-} from "react-router-dom";
+import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import {HelmetProvider} from "react-helmet-async";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.min';

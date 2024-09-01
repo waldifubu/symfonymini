@@ -3,6 +3,9 @@ import './Loading.css';
 export default function Loading() {
 
     return (
-        <h2 className="loading">LOADING</h2>
+        <>
+            <span className="text-center spinner-border text-primary" role="status"></span>
+            <h2 className="loading">LOADING</h2>
+        </>
     )
 }

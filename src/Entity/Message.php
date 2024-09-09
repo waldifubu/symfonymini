@@ -50,7 +50,7 @@ class Message
         return $this->content;
     }
 
-    public function getMine()
+    public function getMine(): ?bool
     {
         return $this->mine;
     }

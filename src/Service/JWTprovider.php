@@ -66,6 +66,7 @@ class JWTprovider implements TokenProviderInterface
                     'subscribe' => $subscribe,
                     'publish' => $subscribe
                 ])
+                ->expiresAt(new \DateTimeImmutable('+2 weeks'))
                 // Builds a new token
                 ->getToken($config->signer(), $config->signingKey());
 

@@ -14,7 +14,7 @@
                 <a class="btn btn-success" href="{{ path("messages_ping", {'id' : conversation.id}) }}">Ping Mercure (EventSource)</a>
                 <h2>Conversation : {{ conversation.name }}</h2>
                 {% if conversation.admin.getId == app.user.getId %}
-                    <a class="btn btn-danger" href="{{ path("conversation_delete", {'id' : conversation.id}) }}">supprimer</a>
+                    <a class="btn btn-danger" href="{{ path("conversation_delete", {'id' : conversation.id}) }}">delete</a>
                 {% endif %}
             {% endif %}
         </div>
@@ -132,27 +132,34 @@
 
                 // Append the topic(s) to subscribe as query parameter
                 url.searchParams.append('topic', pathUri);
-                // console.log('fetch = ' + pathUri);
+                //url.searchParams.append('topic', '/messages/{id}');
+
+                // url.searchParams.append('topic', '/messages/3');
+                console.log('fetch = ' + pathUri);
 
                 // Subscribe to updates
                 const eventSource = new EventSource(url, {
                     withCredentials: true //send cookies by browser
                 });
 
+
+
+                /*
                 const newUrl = new URL(hubUrl);
                 newUrl.searchParams.append('topic', '/ping/2');
                 const eventSource2 = new EventSource(newUrl, {
                     withCredentials: false //send cookies by browser
                 });
+                 */
 
-
+                /*
                 if (typeof (eventSource2 !== undefined)) {
 
                     eventSource2.onmessage = (event) => {
                         console.log("PING!!!!");
                         console.log(event);
                     }
-                }
+                }*/
 
                 if (typeof (eventSource !== undefined)) {
                     eventSource.onmessage = (event) => {

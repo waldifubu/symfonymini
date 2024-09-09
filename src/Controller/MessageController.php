@@ -7,15 +7,19 @@ use App\Entity\Message;
 use App\Entity\User;
 use App\Form\MessageType;
 use App\Repository\MessageRepository;
+use App\Service\JWTprovider;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mercure\Authorization;
 use Symfony\Component\Mercure\HubInterface;
+use Symfony\Component\Mercure\Jwt\TokenProviderInterface;
 use Symfony\Component\Mercure\Update;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -69,10 +73,12 @@ class MessageController extends AbstractController
     #[Route(path: '/{id}/add', name: 'add', requirements: ['id' => '\d+'])]
     #[IsGranted('ROLE_USER')]
     public function add(
-        Request $request,
-        HubInterface $hub,
-        GroupConversation $groupConversation,
-        #[CurrentUser] ?User $user
+        Request              $request,
+        HubInterface         $hub,
+        GroupConversation    $groupConversation,
+        #[CurrentUser] ?User $user,
+        JWTprovider          $jwtProvider,
+//        Authorization        $authorization
     ): Response {
         //        $this->denyAccessUnlessGranted('ROLE_USER');
         // used with connected user
@@ -138,7 +144,31 @@ class MessageController extends AbstractController
             }
         }
 
-        return $this->redirectToRoute('messages_browse', ['groupConversation' => $groupConversation->getId()]);
+
+        /**
+         * https://wiki.alpinelinux.org/wiki/Setting_the_timezone
+         */
+
+        $response= $this->redirectToRoute('messages_browse', [
+            'groupConversation' => $groupConversation->getId()
+
+        ]);
+
+        $token = $jwtProvider->getJwt();
+        //dd($token);
+
+        $response->headers->set(
+            'set-cookie',
+            'mercureAuthorization='.$token.'; Path=/.well-known/mercure; httponly; SameSite=lax'
+        );
+
+        //dd($request->headers->all());
+
+
+        //'mercureAuthorization='.$token.'; Path=/.well-known/mercure; secure; httponly; SameSite=lax'
+//        $authorization->setCookie($request, ['/messages/3']);
+
+        return $response;
     }
 
     /**

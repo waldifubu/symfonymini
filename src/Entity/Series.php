@@ -24,7 +24,7 @@ class Series
     /**
      * @var Collection<int, Episode>
      */
-    #[ORM\OneToMany(targetEntity: Episode::class, mappedBy: 'series', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Episode::class, mappedBy: 'series', fetch: 'LAZY', orphanRemoval: true)]
     private Collection $episodes;
 
     public function __construct()

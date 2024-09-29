@@ -11,15 +11,33 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/series')]
+#[Route('/api/series')]
 final class SeriesController extends AbstractController
 {
     #[Route(name: 'app_series_index', methods: ['GET'])]
-    public function index(SeriesRepository $seriesRepository): Response
+    public function index(SeriesRepository $seriesRepository,
+                          EntityManagerInterface $entityManager): Response
     {
-        return $this->render('series/index.html.twig', [
-            'series' => $seriesRepository->findAll(),
-        ]);
+        $seriesList = $entityManager->getRepository(Series::class)->findAll();
+
+
+        $query = $entityManager->createQuery(
+            'SELECT c FROM App\Entity\\Series c'
+        );
+        $data = $query->getArrayResult();
+
+        /*
+        $data = [];
+
+        foreach ($seriesList as $project) {
+            $data[] = [
+                'id' => $project->getId(),
+                'title' => $project->getTitle(),
+                'author' => $project->getAuthor(),
+            ];
+        }
+*/
+        return $this->json($data);
     }
 
     #[Route('/new', name: 'app_series_new', methods: ['GET', 'POST'])]

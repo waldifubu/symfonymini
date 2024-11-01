@@ -7,10 +7,12 @@ use App\Entity\Message;
 use App\Entity\User;
 use App\Form\MessageType;
 use App\Repository\MessageRepository;
+use App\Service\CookieGenerator2;
 use App\Service\JWTprovider;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,6 +26,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\WebLink\Link;
 
 #[Route(path: '/messages', name: 'messages_')]
 class MessageController extends AbstractController
@@ -39,12 +42,18 @@ class MessageController extends AbstractController
     /**
      * Display list of messages from conversation.
      *
+     * @param Request $request
+     * @param GroupConversation $groupConversation
      * @param User|null $user
+     * @param CookieGenerator2 $cookieGenerator
+     * @return Response
      */
     #[Route(path: '/{groupConversation}', name: 'browse')]
     public function browse(
+        Request $request,
         GroupConversation $groupConversation,
-        #[CurrentUser] ?User $user
+        #[CurrentUser] ?User $user,
+        CookieGenerator2 $cookieGenerator
     ): Response {
         $this->denyAccessUnlessGranted('ROLE_USER');
 
@@ -61,10 +70,23 @@ class MessageController extends AbstractController
             return $m;
         }, $messages);
 
-        return $this->render('message/browse.html.twig', [
+        $hubUrl = $this->getParameter('mercure.default_hub');
+        $this->addLink($request, new Link('mercure', $hubUrl));
+
+        $response = $this->render('message/browse.html.twig', [
             'conversation' => $groupConversation,
             'messages' => $messages,
         ]);
+
+        $response->headers->setCookie(
+            Cookie::create(
+                'mercureAuthorization',
+                $cookieGenerator($groupConversation->getId()),
+                new \DateTime('+1day'),
+                '/.well-known/mercure'
+            )
+        );
+        return $response;
     }
 
     /**

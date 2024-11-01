@@ -129,10 +129,11 @@
                 const hubUrl = new URL('{{ mercure_publish_url }}');
                 //console.log("hubUrl = " + hubUrl);
                 const url = new URL(hubUrl);
+                console.log(url);
 
                 // Append the topic(s) to subscribe as query parameter
-                url.searchParams.append('topic', pathUri);
-                //url.searchParams.append('topic', '/messages/{id}');
+                // url.searchParams.append('topic', pathUri);
+                url.searchParams.append('topic', '/messages/{id}');
 
                 // url.searchParams.append('topic', '/messages/3');
                 console.log('fetch = ' + pathUri);

@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Entity\Series;
 use App\Form\SeriesType;
-use App\Repository\SeriesRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,10 +14,9 @@ use Symfony\Component\Routing\Attribute\Route;
 final class SeriesController extends AbstractController
 {
     #[Route(name: 'app_series_index', methods: ['GET'])]
-    public function index(SeriesRepository $seriesRepository,
-                          EntityManagerInterface $entityManager): Response
+    public function index(EntityManagerInterface $entityManager): Response
     {
-        $seriesList = $entityManager->getRepository(Series::class)->findAll();
+//        $seriesList = $entityManager->getRepository(Series::class)->findAll();
 
 
         $query = $entityManager->createQuery(

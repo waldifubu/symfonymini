@@ -4,8 +4,8 @@ mercure:
             url: '%env(MERCURE_URL)%'
             public_url: '%env(MERCURE_PUBLIC_URL)%'
             jwt:
-                secret: '%env(MERCURE_JWT_SECRET)%'
-                publish: '*'
+#                secret: '%env(MERCURE_JWT_SECRET)%'
+#                publish: '*'
 #                secret: '!ChangeThisMercureHubJWTSecretKey!'
 #                publish: [ 'foo', 'https://example.com/foo' ]
 #                subscribe: [ 'bar', 'http://example.com/bar' ]

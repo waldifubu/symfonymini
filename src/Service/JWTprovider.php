@@ -64,7 +64,7 @@ class JWTprovider implements TokenProviderInterface
             $token = $config->builder()
                 ->withClaim('mercure', [
                     'subscribe' => $subscribe,
-                    'publish' => $subscribe
+                    'publish' => ['*']
                 ])
                 ->expiresAt(new \DateTimeImmutable('+2 weeks'))
                 // Builds a new token

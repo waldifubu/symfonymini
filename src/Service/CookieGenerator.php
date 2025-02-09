@@ -64,13 +64,15 @@ class CookieGenerator
         return Cookie::create(
             'mercureAuthorization',
             $this->jwt,
-            0,
+            new \DateTime('+1day'),
             '/.well-known/mercure',
-            $domain,
+        );
+        /*
+         * $domain,
             $secure,
             $httpOnly,
             false,
             Cookie::SAMESITE_LAX
-        );
+         */
     }
 }

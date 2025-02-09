@@ -26,6 +26,7 @@ services:
         arguments:
             - '%env(MERCURE_JWT_SECRET)%'
             - '@security.token_storage'
+
     App\Service\CookieGenerator:
         arguments:
             $secret: '%env(MERCURE_JWT_SECRET)%'

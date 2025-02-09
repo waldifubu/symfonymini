@@ -139,28 +139,14 @@
                 console.log('fetch = ' + pathUri);
 
                 // Subscribe to updates
-                const eventSource = new EventSource(url, {
-                    withCredentials: true //send cookies by browser
-                });
+                const eventSource = new EventSource(url, {withCredentials: true });
 
-
-
-                /*
-                const newUrl = new URL(hubUrl);
-                newUrl.searchParams.append('topic', '/ping/2');
-                const eventSource2 = new EventSource(newUrl, {
-                    withCredentials: false //send cookies by browser
-                });
-                 */
-
-                /*
-                if (typeof (eventSource2 !== undefined)) {
-
-                    eventSource2.onmessage = (event) => {
-                        console.log("PING!!!!");
-                        console.log(event);
+                eventSource.onerror = event => {
+                    if (tmp.hasOpenenedFileLinkInFirefox) {
+                        console.info('Try to resign after error on protocol open...');
+                        //subscribeDesktopClientUpdateEventsAgain(user);
                     }
-                }*/
+                }
 
                 if (typeof (eventSource !== undefined)) {
                     eventSource.onmessage = (event) => {

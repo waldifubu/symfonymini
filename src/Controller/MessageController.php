@@ -78,6 +78,7 @@ class MessageController extends AbstractController
             'messages' => $messages,
         ]);
 
+        /*
         $response->headers->setCookie(
             Cookie::create(
                 'mercureAuthorization',
@@ -86,6 +87,7 @@ class MessageController extends AbstractController
                 '/.well-known/mercure'
             )
         );
+        */
         return $response;
     }
 
@@ -100,6 +102,7 @@ class MessageController extends AbstractController
         GroupConversation    $groupConversation,
         #[CurrentUser] ?User $user,
         JWTprovider          $jwtProvider,
+        CookieGenerator2 $cookieGenerator
 //        Authorization        $authorization
     ): Response {
         //        $this->denyAccessUnlessGranted('ROLE_USER');
@@ -179,10 +182,21 @@ class MessageController extends AbstractController
         $token = $jwtProvider->getJwt();
         //dd($token);
 
+        /*
         $response->headers->set(
             'set-cookie',
             'mercureAuthorization='.$token.'; Path=/.well-known/mercure; httponly; SameSite=lax'
         );
+        */
+        $response->headers->setCookie(
+            Cookie::create(
+                'mercureAuthorization',
+                $cookieGenerator($groupConversation->getId()),
+                new \DateTime('+1day'),
+                '/.well-known/mercure'
+            )
+        );
+
 
         //dd($request->headers->all());
 

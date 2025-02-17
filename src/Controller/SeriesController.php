@@ -2,13 +2,19 @@
 
 namespace App\Controller;
 
+use App\DBAL\MainCategoryEnum;
+use App\DBAL\SubCategoryEnum;
+use App\Entity\PodcastSeries;
 use App\Entity\Series;
+use App\Form\PodcastSeriesType;
 use App\Form\SeriesType;
 use Doctrine\ORM\EntityManagerInterface;
+use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use UnitEnum;
 
 #[Route('/api/series')]
 final class SeriesController extends AbstractController
@@ -20,7 +26,7 @@ final class SeriesController extends AbstractController
 
 
         $query = $entityManager->createQuery(
-            'SELECT c FROM App\Entity\\Series c'
+            'SELECT c FROM App\Entity\\PodcastSeries c'
         );
         $data = $query->getArrayResult();
 
@@ -38,24 +44,28 @@ final class SeriesController extends AbstractController
         return $this->json($data);
     }
 
-    #[Route('/new', name: 'app_series_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    #[Route(name: 'app_series_create', methods: ['POST'])]
+    public function create(Request $request, EntityManagerInterface $entityManager): Response
     {
-        $series = new Series();
-        $form = $this->createForm(SeriesType::class, $series);
+        $data = $request->request->all();
+        $series = new PodcastSeries();
+
+        $data['mainCategory'] = $this->getEnumKeyFromValue($data['mainCategory'], MainCategoryEnum::class);
+        $data['subCategory'] = $this->getEnumKeyFromValue($data['subCategory'], SubCategoryEnum::class);
+        $form = $this->createForm(PodcastSeriesType::class, $series);
         $form->handleRequest($request);
+        $form->submit($data);
+
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $series->setCreated(new \DateTimeImmutable());
             $entityManager->persist($series);
-            $entityManager->flush();
+//            $entityManager->flush();
 
-            return $this->redirectToRoute('app_series_index', [], Response::HTTP_SEE_OTHER);
+            return $this->json('Created', Response::HTTP_CREATED);
         }
 
-        return $this->render('series/new.html.twig', [
-            'series' => $series,
-            'form' => $form,
-        ]);
+        return $this->json($form->getErrors(true, false), Response::HTTP_BAD_REQUEST);
     }
 
     #[Route('/{id}', name: 'app_series_show', methods: ['GET'])]
@@ -87,11 +97,31 @@ final class SeriesController extends AbstractController
     #[Route('/{id}', name: 'app_series_delete', methods: ['POST'])]
     public function delete(Request $request, Series $series, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$series->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $series->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($series);
             $entityManager->flush();
         }
 
         return $this->redirectToRoute('app_series_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    function getEnumKeyFromValue(string $value, string $enumClass): mixed //?UnitEnum
+    {
+        if (!enum_exists($enumClass)) {
+            throw new InvalidArgumentException("$enumClass is not a valid enum.");
+        }
+
+        // Get all cases of the enum
+        $cases = $enumClass::cases();
+
+        // Iterate through the cases and compare the value
+        foreach ($cases as $case) {
+            if ($case->name === $value) {
+                return $case->value; // Return the key (case name)
+                //return $case; // Return the key (case name)
+            }
+        }
+
+        return null; // Return null if no match is found
     }
 }

@@ -4,7 +4,6 @@ import {createBrowserRouter, Outlet, RouterProvider} from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import MyNavbar from "./components/MyNavbar";
 
-
 const SeriesList: React.LazyExoticComponent<React.ComponentType<any>> = lazy(() => import("./pages/SeriesList"));
 const SeriesCreate: React.LazyExoticComponent<React.ComponentType<any>> = lazy(() => import ("./pages/SeriesCreate"));
 const People: React.LazyExoticComponent<React.ComponentType<any>> = lazy(() => import ("./pages/Example"));
@@ -19,15 +18,15 @@ const routes = [
     },
     {
         path: "/create",
-        element: <Suspense fallback={<div>laden2 ...</div>}><SeriesCreate/></Suspense>
+        element: <Suspense fallback={<div>Laden ...</div>}><SeriesCreate/></Suspense>
     },
     {
         path: "/people",
-        element: <Suspense fallback={<div>laden4 ...</div>}><People/></Suspense>
+        element: <Suspense fallback={<div>Laden ...</div>}><People/></Suspense>
     },
     {
         path: "/people2",
-        element: <Suspense fallback={<div>laden3 ...</div>}><People2/></Suspense>
+        element: <Suspense fallback={<div>Laden ...</div>}><People2/></Suspense>
     },
     {
         path: "/birthday",
@@ -44,7 +43,7 @@ const router = createBrowserRouter([
         path: "/",
         element: <><MyNavbar/><Outlet/></>,
         children: routes
-    }
+    },
 ]);
 
 /*

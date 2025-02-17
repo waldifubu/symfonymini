@@ -20,11 +20,13 @@ const SeriesList: FC = () => {
         id: number;
         title: string;
         author: string;
+        created: any;
 
-        constructor(data: { id: number, title: string; author: string }) {
+        constructor(data: { id: number, name: string; author: string, created: any }) {
             this.id = data.id;
-            this.title = data.title;
+            this.title = data.name;
             this.author = data.author
+            this.created = data.created
         }
     }
 
@@ -46,7 +48,8 @@ const SeriesList: FC = () => {
                             {
                                 "id": 1,
                                 "title": "waldi",
-                                "author": "fallback"
+                                "author": "fallback",
+                                "created": "2021-09-01T00:00:00+00:00"
                             }
                         ];
                         // @ts-ignore
@@ -58,18 +61,22 @@ const SeriesList: FC = () => {
 
     useEffect(() => {
         fetchSeriesList();
-    }, [fetchSeriesList])
+    }, [fetchSeriesList]);
 
 
     return (
         <Container>
             <Card>
                 <CardHeader>
-                    <Button color="primary">Create new podcast</Button>
                     <Link
                         className="btn btn-outline-primary"
-                        to="/create">Create New Project
+                        to="/create">Create new podcast
                     </Link>
+
+                    {/*<Link
+                        className="btn btn-outline-primary"
+                        to="/create">Create New Project
+                    </Link>*/}
                 </CardHeader>
                 <CardBody>
                     {seriesList.length > 0 && <Table className="" hover={true}>
@@ -78,6 +85,7 @@ const SeriesList: FC = () => {
                             <th>#</th>
                             <th>Title</th>
                             <th>Author</th>
+                            <th>Erstellt</th>
                         </tr>
                         </thead>
                         <tbody>

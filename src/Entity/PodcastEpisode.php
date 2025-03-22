@@ -24,13 +24,13 @@ class PodcastEpisode
     #[ORM\Column(nullable: true)]
     private ?int $duration = null;
 
-    #[ORM\Column(length: 500, nullable: true)]
-    private ?string $summary = null;
+    #[ORM\Column(length: 545, nullable: true)]
+    private ?string $description = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $published = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 355, nullable: true)]
     private ?string $fileUrl = null;
 
     #[ORM\Column(nullable: true)]
@@ -42,11 +42,20 @@ class PodcastEpisode
     #[ORM\Column]
     private ?bool $explicit = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 355, nullable: true)]
     private ?string $coverUrl = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $keywords = null;
+
+    #[ORM\Column(length: 20, nullable: true)]
+    private ?string $episodeType = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $author = null;
+
+    #[ORM\Column(length: 545, nullable: true)]
+    private ?string $content = null;
 
     public function getId(): ?int
     {
@@ -89,14 +98,14 @@ class PodcastEpisode
         return $this;
     }
 
-    public function getSummary(): ?string
+    public function getDescription(): ?string
     {
-        return $this->summary;
+        return $this->description;
     }
 
-    public function setSummary(?string $summary): static
+    public function setDescription(?string $description): static
     {
-        $this->summary = $summary;
+        $this->description = $description;
 
         return $this;
     }
@@ -181,6 +190,42 @@ class PodcastEpisode
     public function setKeywords(?string $keywords): static
     {
         $this->keywords = $keywords;
+
+        return $this;
+    }
+
+    public function getEpisodeType(): ?string
+    {
+        return $this->episodeType;
+    }
+
+    public function setEpisodeType(?string $episodeType): static
+    {
+        $this->episodeType = $episodeType;
+
+        return $this;
+    }
+
+    public function getAuthor(): ?string
+    {
+        return $this->author;
+    }
+
+    public function setAuthor(?string $author): static
+    {
+        $this->author = $author;
+
+        return $this;
+    }
+
+    public function getContent(): ?string
+    {
+        return $this->content;
+    }
+
+    public function setContent(?string $content): static
+    {
+        $this->content = $content;
 
         return $this;
     }

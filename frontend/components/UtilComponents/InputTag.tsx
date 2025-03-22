@@ -1,5 +1,6 @@
 import React from "react";
 import { WithContext as ReactTags, Tag } from "react-tag-input";
+import "./inputTag.css";
 
 interface InputTagProps {
     tags: Tag[];

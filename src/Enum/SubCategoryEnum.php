@@ -1,6 +1,6 @@
 <?php
 
-namespace App\DBAL;
+namespace App\Enum;
 
 enum SubCategoryEnum: string
 {
@@ -294,5 +294,10 @@ enum SubCategoryEnum: string
             self::FILM_REVIEWS->name => self::FILM_REVIEWS,
             self::TV_REVIEWS->name => self::TV_REVIEWS,
         ];
+    }
+
+    public static function tryFromName(?string $name)
+    {
+        return array_reduce(self::cases(), fn(?self $carry, self $case) => $case->name === $name ? $case : $carry, null);
     }
 }

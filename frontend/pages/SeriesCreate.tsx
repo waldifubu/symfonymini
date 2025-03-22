@@ -1,6 +1,7 @@
 import React, {ChangeEvent, FC, useEffect, useState} from "react";
 import {
     Alert,
+    Badge,
     Button,
     Card,
     CardBody,
@@ -18,7 +19,6 @@ import Swal from 'sweetalert2'
 import {Link, useNavigate} from "react-router-dom";
 import TooltipItem from "../components/UtilComponents/TooltipItem";
 import MyButtonGroup from "../components/UtilComponents/MyButtonGroup";
-import "../components/UtilComponents/inputTag.css";
 import InputTag from "../components/UtilComponents/InputTag";
 import {Tag} from "react-tag-input";
 
@@ -39,6 +39,9 @@ const SeriesCreate: React.FC = () => {
     const [mainCategories, setMainCategories] = useState<Category[]>([])
     const [subCategories, setSubCategories] = useState<Category[]>([])
 
+    const frequencyListStyle = {
+        cursor: 'pointer',
+    }
 
     const blockText: string = 'If you want your show removed from the Apple directory, use this tag.\n' +
         '\n' +
@@ -88,12 +91,13 @@ const SeriesCreate: React.FC = () => {
         formData.append('blocked', blockSelected ? '1' : '0')
         formData.append('explicit', explicitSelected ? '1' : '0')
         formData.append('complete', completeSelected ? '1' : '0')
+        formData.append('keywords', tags.map(tag => tag.text).join(', '))
 
-        const tagsString = tags.map(tag => tag.text).join(', ');
-        formData.append('keywords', tagsString)
+        // const tagsString = tags.map(tag => tag.text).join(', ');
+        // formData.append('keywords', tagsString)
 
         console.log([...formData.entries()])
-        return;
+        // return;
         // const newPodcast: { [p: string]: File | string } = Object.fromEntries(formData)
         // console.log(refContainer.current?.value)
         axios.post('/api/series', formData)
@@ -113,17 +117,18 @@ const SeriesCreate: React.FC = () => {
                         icon: 'info',
                         title: response.statusText,
                         showConfirmButton: false,
-                        timer: 2500
+                        timer: 500
                     }).then(() => {
                         navigate('/')
                     });
                 }
             }).catch(function (error) {
+            console.log(error.response.data)
             Swal.fire({
                 icon: 'error',
-                title: error,
+                title: error + ', Response: ' + error.response.data,
                 showConfirmButton: false,
-                timer: 2100
+                timer: 3100
             })
         });
     }
@@ -148,8 +153,6 @@ const SeriesCreate: React.FC = () => {
     };
 
     useEffect(() => {
-        // console.log(refContainer)
-        // console.log(`Neue Beschreibung ${description}`)
         fetchMainCategories();
         window.scrollTo(0, 0);
         document.getElementById("inputTitle")?.focus();
@@ -160,6 +163,7 @@ const SeriesCreate: React.FC = () => {
     }
 
     function fetchSubCategories(category: string) {
+        setIsLoading(true); // Data is loading
         axios.get(`/api/category/${category}`)
             .then(function (response) {
                 // console.log(response.data)
@@ -203,13 +207,37 @@ const SeriesCreate: React.FC = () => {
         }
     }
 
+    const setFrequent = (value: string) => {
+        let frequency = document.getElementById('frequency') as HTMLInputElement;
+        frequency.value = value;
+    }
+
+    const setPublishedDate = () => {
+        let pubDate = document.getElementById('pubDate') as HTMLInputElement;
+
+        const date = new Date();
+        const options: Intl.DateTimeFormatOptions = {
+            weekday: 'short',
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            timeZoneName: 'short',
+            hour12: false
+        };
+
+        pubDate.value = date.toLocaleString('en-US', options);
+    };
+
     // @ts-ignore
     return (
         <Container>
             <Card>
-                <CardHeader><h1>Create Podcast</h1></CardHeader>
+                <CardHeader><h2>Create Podcast</h2></CardHeader>
                 <CardBody>
-                    <Form method="POST" autoComplete="on" onSubmit={handleSubmit}>
+                    <Form method="post" autoComplete="on" onSubmit={handleSubmit}>
                         <FormGroup>
                             <Label for="podcastTitle">
                                 <span id="podcastTitle">Podcast Title</span>
@@ -240,7 +268,7 @@ const SeriesCreate: React.FC = () => {
                                    id="description"
                                    name="description"
                                    placeholder=""
-                                   type="text"
+                                   type="textarea"
                             />
                         </FormGroup>
                         <FormGroup>
@@ -261,7 +289,7 @@ const SeriesCreate: React.FC = () => {
                             />
                         </FormGroup>
 
-                        <div className={"d-flex"}>
+                        <div className={"d-flex justify-content-between"}>
                             <FormGroup>
                                 <Label for="locked">
                                     <span id="locked">Is locked? &nbsp;</span>
@@ -322,24 +350,41 @@ const SeriesCreate: React.FC = () => {
                             />
                         </FormGroup>
 
-                        <FormGroup>
-                            <Label for="language">
-                                <span id="language">Language</span>
-                                <TooltipItem position={'top'} target={'language'}
-                                             text={'Because Apple Podcasts is available in territories around the world, it is critical to specify the language of a podcast. Apple Podcasts only supports values from the ISO 639 list (two-letter language codes, with some possible modifiers, such as "fr-ca").\n' +
-                                                 '\n' +
-                                                 'Invalid language codes will cause your feed to fail Apple validation.'}/>
-                            </Label>
-                            <Input
-                                name="language"
-                                placeholder="de"
-                                type="text"
-                            />
-                        </FormGroup>
+                        <div className={"d-flex w-100"}>
+                            <FormGroup className={"flex-fill me-2"}>
+                                <Label for="language">
+                                    <span id="language">Language</span>
+                                    <TooltipItem position={'top'} target={'language'}
+                                                 text={'Because Apple Podcasts is available in territories around the world, it is critical to specify the language of a podcast. Apple Podcasts only supports values from the ISO 639 list (two-letter language codes, with some possible modifiers, such as "fr-ca").\n' +
+                                                     '\n' +
+                                                     'Invalid language codes will cause your feed to fail Apple validation.'}/>
+                                </Label>
+                                <Input
+                                    className="w-100"
+                                    name="language"
+                                    placeholder="de-de"
+                                    type="text"
+                                />
+                            </FormGroup>
+
+                            <FormGroup className={"flex-fill"}>
+                                <Label for="ttl">
+                                    <span id="ttl">TTL</span>
+                                    <TooltipItem position={'top'} target={'ttl'}
+                                                 text={'Element specifies the number of minutes the feed can stay cached before refreshing it from the source.'}/>
+                                </Label>
+                                <Input
+                                    className={"w-100"}
+                                    name="ttl"
+                                    defaultValue="60"
+                                    type="text"
+                                />
+                            </FormGroup>
+                        </div>
 
                         <FormGroup>
                             <Label for="cover">
-                                Cover URL
+                                Cover URL (optional)
                             </Label>
                             <Input
                                 name="cover"
@@ -363,17 +408,12 @@ const SeriesCreate: React.FC = () => {
                             </Input>
 
                             <Collapse isOpen={isTypeOpen}>
-                                <Alert color="light" className="ddd-none" id="typeInfo">
-                                    <h4 className="alert-heading">
-                                        Explanation
-                                    </h4>
-                                    <p>
-                                        {typeSelected !== '' ? (
-                                            <span dangerouslySetInnerHTML={{ __html: typeSelected }} />
-                                        ) : (
-                                            'Select a type to see the explanation'
-                                        )}
-                                    </p>
+                                <Alert color="light" className="" id="typeInfo">
+                                    {typeSelected !== '' ? (
+                                        <span dangerouslySetInnerHTML={{__html: typeSelected}}/>
+                                    ) : (
+                                        'Select a type to see the explanation'
+                                    )}
                                 </Alert>
                             </Collapse>
                         </FormGroup>
@@ -406,9 +446,7 @@ const SeriesCreate: React.FC = () => {
                             </Label>
                             <Input type="select" name="mainCategory" id="category"
                                    onChange={(e: ChangeEvent<HTMLInputElement>) => fetchSubCategories(e.target.value)}>
-                                {isLoading ? (
-                                    <option>Loading...</option>
-                                ) : (
+                                {
                                     <>
                                         <option value="">Select a category</option>
                                         {mainCategories.map((category, index) => (
@@ -417,7 +455,7 @@ const SeriesCreate: React.FC = () => {
                                             </option>
                                         ))}
                                     </>
-                                )}
+                                }
                             </Input>
                         </FormGroup>
 
@@ -425,7 +463,24 @@ const SeriesCreate: React.FC = () => {
                             <Label for="subCategory">
                                 Subcategory
                             </Label>
-                            <Input type="select" name="subCategory" id="subcategory">
+                            <Input type="select" name="subCategory" id="subcategory" disabled={isLoading}
+                                   style={{
+                                           // Base style (applies always)
+                                           color: "black",
+                                           // Conditional styles based on isLoading
+                                           ...(isLoading
+                                               ? {
+                                                   color: "#ff0000", // Gray background when loading
+                                                   cursor: "wait", // Show loading cursor
+                                                   opacity: 0.7, // Fade appearance
+                                               }
+                                               : {
+                                                   // color: "black", // Normal text color
+                                                   // backgroundColor: "white", // Normal background
+                                                   // cursor: "default", // Default cursor
+                                               }),
+                                       }}
+                                >
                                 {isLoading ? (
                                     <option>Loading...</option>
                                 ) : (
@@ -458,11 +513,12 @@ const SeriesCreate: React.FC = () => {
 
                         <FormGroup>
                             <Label for="pubDate">
-                                Published Date
+                                Published Date <sub style={{cursor: 'pointer'}}
+                                                    onClick={() => setPublishedDate()}>(now)</sub>
                             </Label>
                             <Input
                                 id="pubDate"
-                                name="pubDate"
+                                name="published"
                                 placeholder="Fri, 01 Jan 2025 06:00:00 PDT"
                                 type="text"
                             />
@@ -479,20 +535,61 @@ const SeriesCreate: React.FC = () => {
                                 type="text"
                             />
                             Examples:
-                            <List type="inline" tag="ul">
-                                <li>FREQ=DAILY means Daily</li>
-                                <li>FREQ=WEEKLY means Weekly</li>
-                                <li>FREQ=MONTHLY means Monthly</li>
-                                <li>FREQ=YEARLY means Yearly</li>
-                                <li>FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR means Monday to Friday</li>
-                                <li>FREQ=WEEKLY;BYDAY=MO,WE means Monday and Wednesday</li>
-                                <li>FREQ=WEEKLY;BYDAY=FR;BYMONTHDAY=13 means Friday the 13th</li>
-                                <li>FREQ=YEARLY;BYDAY=+4TH;BYMONTH=11 means the fourth Thursday in November
-                                    (Thanksgiving)
+                            <List type="inline" tag="ul" id="frequencyList">
+                                <li onClick={() => setFrequent('FREQ=DAILY')} style={frequencyListStyle}>
+                                    <Badge
+                                        color="info"
+                                        pill
+                                    >
+                                        FREQ=DAILY
+                                    </Badge>
+                                    means Daily
                                 </li>
-                                <li>FREQ=WEEKLY;INTERVAL=2;BYDAY=MO;COUNT=10 means every other Monday for 10 weeks</li>
-                                <li>FREQ=WEEKLY;UNTIL=20231231;BYDAY=MO means every Monday until the end of 2023</li>
-                                <li>true means no more updates (completed or stopped)</li>
+                                <li onClick={() => setFrequent('FREQ=WEEKLY')} style={frequencyListStyle}>
+                                    <Badge color="info" pill>
+                                        FREQ=WEEKLY
+                                    </Badge>
+                                    means Weekly
+                                </li>
+                                <li onClick={() => setFrequent('FREQ=MONTHLY')} style={frequencyListStyle}>
+                                    <Badge color="info" pill>
+                                        FREQ=MONTHLY
+                                    </Badge>
+                                    means Monthly
+                                </li>
+                                <li onClick={() => setFrequent('FREQ=YEARLY')} style={frequencyListStyle}>
+                                    <Badge color="info" pill>
+                                        FREQ=YEARLY
+                                    </Badge>
+                                    means Yearly
+                                </li>
+                                <li onClick={() => setFrequent('FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR')}
+                                    style={frequencyListStyle}>FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR means Monday to Friday
+                                </li>
+                                <li onClick={() => setFrequent('FREQ=WEEKLY;BYDAY=MO,WE')}
+                                    style={frequencyListStyle}>FREQ=WEEKLY;BYDAY=MO,WE means Monday and Wednesday
+                                </li>
+                                <li onClick={() => setFrequent('FREQ=WEEKLY;BYDAY=FR;BYMONTHDAY=13')}
+                                    style={frequencyListStyle}>FREQ=WEEKLY;BYDAY=FR;BYMONTHDAY=13 means Friday the 13th
+                                </li>
+                                <li onClick={() => setFrequent('FREQ=YEARLY;BYDAY=+4TH;BYMONTH=11')}
+                                    style={frequencyListStyle}>FREQ=YEARLY;BYDAY=+4TH;BYMONTH=11 means the fourth
+                                    Thursday in November (Thanksgiving)
+                                </li>
+                                <li onClick={() => setFrequent('FREQ=WEEKLY;INTERVAL=2;BYDAY=MO;COUNT=10')}
+                                    style={frequencyListStyle}>FREQ=WEEKLY;INTERVAL=2;BYDAY=MO;COUNT=10 means every
+                                    other Monday for 10 weeks
+                                </li>
+                                <li onClick={() => setFrequent('FREQ=WEEKLY;UNTIL=20231231;BYDAY=MO')}
+                                    style={frequencyListStyle}>FREQ=WEEKLY;UNTIL=20231231;BYDAY=MO means every Monday
+                                    until the end of 2023
+                                </li>
+                                <li onClick={() => setFrequent('true')} style={frequencyListStyle}>
+                                    <Badge color="info" pill>
+                                        true
+                                    </Badge>
+                                    means no more updates (completed or stopped)
+                                </li>
                             </List>
 
                         </FormGroup>

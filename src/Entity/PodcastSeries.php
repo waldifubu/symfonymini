@@ -2,13 +2,15 @@
 
 namespace App\Entity;
 
-use App\DBAL\MainCategoryEnum;
-use App\DBAL\SubCategoryEnum;
+use App\Enum\MainCategoryEnum;
+use App\Enum\SubCategoryEnum;
 use App\Repository\PodcastSeriesRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: PodcastSeriesRepository::class)]
 class PodcastSeries
@@ -38,7 +40,7 @@ class PodcastSeries
     private ?string $author = null;
 
     #[ORM\Column]
-    private ?bool $locked = null;
+    private ?bool $locked = true;
 
     #[ORM\Column]
     private ?bool $explicit = null;
@@ -81,16 +83,35 @@ class PodcastSeries
     private ?string $keywords = null;
 
     #[ORM\Column(nullable: true)]
-    private ?bool $blocked = null;
+    private ?bool $blocked = true;
 
     #[ORM\Column(nullable: true)]
     private ?bool $complete = null;
 
-    #[ORM\Column(enumType: MainCategoryEnum::class, nullable: true)]
-    private ?MainCategoryEnum $mainCategory = null;
+    #[Assert\Choice(callback: [MainCategoryEnum::class, 'validKeys'])]
+    #[ORM\Column(type: 'string', nullable: true)]
+    private ?string $mainCategory = MainCategoryEnum::NONE->name;
 
-    #[ORM\Column(nullable: true, enumType: SubCategoryEnum::class)]
-    private ?SubCategoryEnum $subCategory = null;
+    #[ORM\Column(type: 'string', nullable: true)]
+    private ?string $subCategory = SubCategoryEnum::NONE->name;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $ttl = 60;
+
+    #[ORM\Column(length: 100, nullable: true)]
+    private ?string $frequency = null;
+
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $published = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $ownerEmail = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $lastBuildDate = null;
+
+    #[ORM\Column(type: 'uuid', nullable: true)]
+    private ?Uuid $uuid = null;
 
     public function __construct()
     {
@@ -307,26 +328,110 @@ class PodcastSeries
         return $this;
     }
 
+    // Getter: Convert stored key to enum instance
     public function getMainCategory(): ?MainCategoryEnum
     {
-        return $this->mainCategory;
+        //return $this->mainCategory ? MainCategoryEnum::from($this->mainCategory) : null;
+
+        if (!$this->mainCategory) {
+            return null;
+        }
+
+        // Use tryFromName (custom method) to resolve the key
+        return MainCategoryEnum::tryFromName($this->mainCategory);
     }
 
-    public function setMainCategory(MainCategoryEnum $mainCategory): static
+// Setter: Convert enum instance to its key
+    public function setMainCategory(?MainCategoryEnum $mainCategory): self
     {
-        $this->mainCategory = $mainCategory;
-
+        $this->mainCategory = $mainCategory?->name; // Store the key (e.g., 'NONE')
         return $this;
     }
 
     public function getSubCategory(): ?SubCategoryEnum
     {
-        return $this->subCategory;
+        if(!$this->subCategory) {
+            return null;
+        }
+
+        return SubCategoryEnum::tryFromName($this->subCategory);
     }
 
     public function setSubCategory(?SubCategoryEnum $subCategory): static
     {
-        $this->subCategory = $subCategory;
+        $this->subCategory = $subCategory?->name;
+
+        return $this;
+    }
+
+    public function getTtl(): ?int
+    {
+        return $this->ttl;
+    }
+
+    public function setTtl(?int $ttl): static
+    {
+        $this->ttl = $ttl;
+
+        return $this;
+    }
+
+    public function getFrequency(): ?string
+    {
+        return $this->frequency;
+    }
+
+    public function setFrequency(?string $frequency): static
+    {
+        $this->frequency = $frequency;
+
+        return $this;
+    }
+
+    public function getPublished(): ?\DateTimeInterface
+    {
+        return $this->published;
+    }
+
+    public function setPublished(?\DateTimeInterface $published): static
+    {
+        $this->published = $published;
+
+        return $this;
+    }
+
+    public function getOwnerEmail(): ?string
+    {
+        return $this->ownerEmail;
+    }
+
+    public function setOwnerEmail(?string $ownerEmail): static
+    {
+        $this->ownerEmail = $ownerEmail;
+
+        return $this;
+    }
+
+    public function getLastBuildDate(): ?\DateTimeInterface
+    {
+        return $this->lastBuildDate;
+    }
+
+    public function setLastBuildDate(?\DateTimeInterface $lastBuildDate): static
+    {
+        $this->lastBuildDate = $lastBuildDate;
+
+        return $this;
+    }
+
+    public function getUuid(): ?Uuid
+    {
+        return $this->uuid;
+    }
+
+    public function setUuid(Uuid $uuid): static
+    {
+        $this->uuid = $uuid;
 
         return $this;
     }

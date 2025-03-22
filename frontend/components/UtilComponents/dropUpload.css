@@ -1,0 +1,16 @@
+#dropArea {
+    margin: 0 auto;
+
+    border: 2px dashed transparent;
+    background: #fff;
+    border-radius: 10px;
+    width: 500px;
+    padding: 20px 20px 30px;
+
+    background: radial-gradient(
+            100% 400% at 100% 50%,
+            #fff 0%,
+            rgb(233, 171, 255) 40%,
+            rgb(150, 173, 255) 80%
+    ) right 0% / 400% 100% no-repeat;
+}

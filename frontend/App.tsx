@@ -10,6 +10,7 @@ const People: React.LazyExoticComponent<React.ComponentType<any>> = lazy(() => i
 const People2: React.LazyExoticComponent<React.ComponentType<any>> = lazy(() => import ("./components/ExampleReducer"));
 const BirthdayReminder: React.LazyExoticComponent<React.ComponentType<any>> = lazy(() => import("./pages/BirthdayReminder"));
 const Tours: React.LazyExoticComponent<React.ComponentType<any>> = lazy(() => import("./pages/ToursPage"));
+const EpisodeCreate: React.LazyExoticComponent<React.ComponentType<any>> = lazy(() => import("./pages/EpisodeCreate"));
 
 const routes = [
     {
@@ -35,12 +36,16 @@ const routes = [
     {
         path: "/tours",
         element: <Suspense fallback={<div>Loading</div>}><Tours/></Suspense>
+    },
+    {
+        path: "/episode/add/:id",
+        element: <Suspense fallback={<div>Loading</div>}><EpisodeCreate/></Suspense>
     }
+
 ]
 
 const router = createBrowserRouter([
     {
-        path: "/",
         element: <><MyNavbar/><Outlet/></>,
         children: routes
     },

@@ -16,6 +16,7 @@ import {
 import {Link, useNavigate} from "react-router-dom";
 import Items from "./Items";
 import UserContainer from "./UserContainer";
+import podcastLogo from "../assets/favicon.png";
 
 const MyNavbar = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -42,7 +43,9 @@ const MyNavbar = () => {
         <header>
             <Navbar container="fluid" color="light" className="mb-1" expand="lg">
                 <NavbarBrand>
-                    <Link style={{color: 'inherit', textDecoration: 'none'}} to="/">Podcast Management</Link>
+                    <Link style={{color: 'inherit', textDecoration: 'none'}} to="/">
+                        <img style={{width: '30px'}} alt="Podcast logo" src={podcastLogo}/> Podcast Management
+                    </Link>
                 </NavbarBrand>
                 <NavbarToggler onClick={toggle}/>
                 <Collapse isOpen={isOpen} navbar>

@@ -26,6 +26,9 @@
             "./migrations/.gitignore"
         ]
     },
+    "fresh/doctrine-enum-bundle": {
+        "version": "v10.1.0"
+    },
     "pentatrion/vite-bundle": {
         "version": "7.0",
         "recipe": {

@@ -3,13 +3,16 @@
 namespace App\Form;
 
 use App\Entity\PodcastSeries;
+use App\Enum\Status;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use App\DBAL\MainCategoryEnum;
-use App\DBAL\SubCategoryEnum;
+use App\Enum\MainCategoryEnum;
+use App\Enum\SubCategoryEnum;
 
 class PodcastSeriesType extends AbstractType
 {
@@ -26,25 +29,54 @@ class PodcastSeriesType extends AbstractType
             ->add('copyright')
             ->add('language')
             ->add('cover')
-            ->add('type')
+            ->add('type', ChoiceType::class, [
+                'choices' => [
+                    'Episodic' => 'episodic',
+                    'Serial' => 'serial',
+                ],
+                'multiple' => false,
+                'expanded' => false,
+            ])
+            // episodic
+            // serial
             ->add('owner')
-            ->add('mainCategory', EnumType::class, [
-                'class' => MainCategoryEnum::class,
-                'choices' => MainCategoryEnum::cases() ,//$this->formatEnumChoices(MainCategoryEnum::cases()),
+            ->add('ttl')
+            ->add('frequency')
+            ->add('published', DateTimeType::class, [
+                'widget' => 'single_text',
+            ])
+            ->add('ownerEmail')
+            ->add('mainCategory', ChoiceType::class, [
+                'choices' => MainCategoryEnum::cases(), // Use enum cases as choices
+                // VALUue not needed?????
+//                'choice_value' => fn(?MainCategoryEnum $status): string => $status?->name ?? '',
+                'choice_label' => fn(MainCategoryEnum $enum): string => $enum->value,
+                'placeholder' => 'Select a category',
                 'multiple' => false,
                 'expanded' => false,
+                'empty_data' => null,
             ])
-            ->add('subCategory', EnumType::class, [
-                'class' => SubCategoryEnum::class,
-//                'choices' => SubCategoryEnum::cases(),//
-              'choices' =>  SubCategoryEnum::cases(), //$this->formatEnumChoices(SubCategoryEnum::cases()),
+            ->add('subCategory', ChoiceType::class, [
+                'choices' => SubCategoryEnum::cases(),
+//                'choice_value' => fn(?SubCategoryEnum $status): string => $status?->name ?? '',
+                'choice_label' => fn(SubCategoryEnum $enum):string => $enum->value,
+                'placeholder' => 'Select a category',
                 'multiple' => false,
                 'expanded' => false,
+                'empty_data' => null,
             ])
-            ->add('keywords')
-        ;
+            ->add('keywords');
     }
 
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'compound'   => true,
+            'empty_data' => null,
+            'csrf_protection' => false,
+            'data_class' => PodcastSeries::class,
+        ]);
+    }
 
     /**
      * Formats enum cases into a choices array for Symfony's ChoiceType.
@@ -60,13 +92,5 @@ class PodcastSeriesType extends AbstractType
             $choices[$case->name] = $case->name;
         }
         return $choices;
-    }
-
-    public function configureOptions(OptionsResolver $resolver): void
-    {
-        $resolver->setDefaults([
-            'csrf_protection' => false,
-            'data_class' => PodcastSeries::class,
-        ]);
     }
 }

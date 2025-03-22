@@ -2,8 +2,8 @@
 
 namespace App\Controller;
 
-use App\DBAL\MainCategoryEnum;
-use App\DBAL\SubCategoryEnum;
+use App\Enum\MainCategoryEnum;
+use App\Enum\SubCategoryEnum;
 use InvalidArgumentException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -34,7 +34,7 @@ class CategoryController extends AbstractController
             return $jsonResponse->setEncodingOptions(JSON_UNESCAPED_UNICODE);
         }
 
-        return new JsonResponse([SubCategoryEnum::NONE->name => SubCategoryEnum::NONE], json: false, status:  Response::HTTP_OK);
+        return new JsonResponse([SubCategoryEnum::NONE->name => SubCategoryEnum::NONE], json: false, status: Response::HTTP_OK);
     }
 
     public function determeinMethodName(string $categoryname): string

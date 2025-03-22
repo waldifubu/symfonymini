@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace App\DBAL;
+namespace App\Enum;
 
 enum MainCategoryEnum: string
 {
@@ -26,6 +26,17 @@ enum MainCategoryEnum: string
     case TRUE_CRIME = 'True Crime';
     case TV_FILM = 'TV & Film';
 
+    public static function validKeys(): array
+    {
+        return array_column(self::cases(), 'name');
+    }
+
+    // Resolve enum case by KEY (case name)
+    public static function tryFromName(string $name): ?self
+    {
+        return array_reduce(self::cases(), fn(?self $carry, self $case) => $case->name === $name ? $case : $carry, null);
+    }
+
     /**
      * @return array<string,string>
      */
@@ -33,7 +44,7 @@ enum MainCategoryEnum: string
     {
         return array_reduce(
             self::cases(),
-            static fn (array $choices, MainCategoryEnum $type) => $choices + [$type->name => $type->value],
+            static fn(array $choices, MainCategoryEnum $type) => $choices + [$type->name => $type->value],
             [],
         );
     }

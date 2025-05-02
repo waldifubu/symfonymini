@@ -1,6 +1,6 @@
 import './components/app.css';
 import React, {lazy, Suspense} from 'react';
-import {createBrowserRouter, Outlet, RouterProvider} from "react-router-dom";
+import {BrowserRouter, createBrowserRouter, Outlet, Route, Routes, RouterProvider } from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import MyNavbar from "./components/MyNavbar";
 

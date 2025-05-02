@@ -1,4 +1,4 @@
-import React, {ChangeEvent, FC, useEffect, useState} from "react";
+import React, {ChangeEvent, FC, Key, useEffect, useState} from "react";
 import {
     Alert,
     Badge,
@@ -21,6 +21,7 @@ import TooltipItem from "../components/UtilComponents/TooltipItem";
 import MyButtonGroup from "../components/UtilComponents/MyButtonGroup";
 import InputTag from "../components/UtilComponents/InputTag";
 import {Tag} from "react-tag-input";
+import {useQuery} from "@tanstack/react-query";
 
 const SeriesCreate: React.FC = () => {
     const navigate = useNavigate();
@@ -36,8 +37,9 @@ const SeriesCreate: React.FC = () => {
 
     const [cSelected, setCSelected] = useState([]);
     // const [description, setDescription] = useState('')
-    const [mainCategories, setMainCategories] = useState<Category[]>([])
-    const [subCategories, setSubCategories] = useState<Category[]>([])
+    // const [mainCategories, setMainCategories] = useState<Category[]>([])
+    // const [subCategories, setSubCategories] = useState<Category[]>([])
+    const [selectedMainCategory, setSelectedMainCategory] = useState<string>("");
 
     const frequencyListStyle = {
         cursor: 'pointer',
@@ -133,27 +135,30 @@ const SeriesCreate: React.FC = () => {
         });
     }
 
-    const fetchMainCategories = () => {
-        axios.get('/api/category')
-            .then(function (response) {
-                const transformedData: {
-                    value: string,
-                    name: string
-                }[] = Object.entries(response.data).map(([value, name]) => ({
-                    value,
-                    name: name as string,
-                }));
-                setIsLoading(false); // Data has been loaded
-                setMainCategories(transformedData); // Set the transformed data to state
-            })
-            .catch(function (error) {
-                setIsLoading(false); // Data has been loaded
-                console.log(error)
-            })
-    };
+    // Fetch main categories with React Query
+    const { data: mainCategories = [], isLoading: isLoadingMain } = useQuery<Category[]>({
+        queryKey: ['mainCategories'],
+        queryFn: async () => {
+            const response = await axios.get('/api/category');
+            return Object.entries(response.data).map(([value, name]) => ({
+                value,
+                name: name as string,
+            }));
+        },
+    });
+
+    /*
+    onError: (error) => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Failed to load categories',
+                text: error.message,
+            });
+            return [];
+        }
+     */
 
     useEffect(() => {
-        fetchMainCategories();
         window.scrollTo(0, 0);
         document.getElementById("inputTitle")?.focus();
     }, []);
@@ -162,26 +167,32 @@ const SeriesCreate: React.FC = () => {
         // setDescription(e.target.value)
     }
 
-    function fetchSubCategories(category: string) {
-        setIsLoading(true); // Data is loading
-        axios.get(`/api/category/${category}`)
-            .then(function (response) {
-                // console.log(response.data)
-                const transformedData: {
-                    value: string,
-                    name: string
-                }[] = Object.entries(response.data).map(([value, name]) => ({
-                    value,
-                    name: name as string,
-                }));
-                setIsLoading(false); // Data has been loaded
-                setSubCategories(transformedData); // Set the transformed data to state
-            })
-            .catch(function (error) {
-                setIsLoading(false); // Data has been loaded
-                console.log(error)
-            })
-    }
+    // Fetch subcategories with React Query (dependent query)
+    const { data: subCategories = [], isLoading: isLoadingSub } = useQuery<Category[]>({
+        queryKey: ['subCategories', selectedMainCategory],
+        queryFn: async () => {
+            const response = await axios.get(`/api/category/${selectedMainCategory}`);
+            setIsLoading(false);
+            return Object.entries(response.data).map(([value, name]) => ({
+                value,
+                name: name as string,
+            }));
+        },
+        enabled: !!selectedMainCategory, // Only fetch when main category is selected
+        onError: (error) => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Failed to load subcategories',
+                text: error.message,
+            });
+            setIsLoading(false);
+        }
+    });
+
+    // Update main category select handler
+    const handleMainCategoryChange = (e: ChangeEvent<HTMLInputElement>) => {
+        setSelectedMainCategory(e.target.value);
+    };
 
     const onCheckboxBtnClick = (selected: any) => {
         // @ts-ignore
@@ -231,6 +242,8 @@ const SeriesCreate: React.FC = () => {
         pubDate.value = date.toLocaleString('en-US', options);
     };
 
+    // @ts-ignore
+    // @ts-ignore
     // @ts-ignore
     return (
         <Container>
@@ -445,7 +458,9 @@ const SeriesCreate: React.FC = () => {
                                 Category
                             </Label>
                             <Input type="select" name="mainCategory" id="category"
-                                   onChange={(e: ChangeEvent<HTMLInputElement>) => fetchSubCategories(e.target.value)}>
+                                   onChange={handleMainCategoryChange}
+                                   value={selectedMainCategory}
+                            >
                                 {
                                     <>
                                         <option value="">Select a category</option>
@@ -468,7 +483,7 @@ const SeriesCreate: React.FC = () => {
                                            // Base style (applies always)
                                            color: "black",
                                            // Conditional styles based on isLoading
-                                           ...(isLoading
+                                           ...(isLoadingSub
                                                ? {
                                                    color: "#ff0000", // Gray background when loading
                                                    cursor: "wait", // Show loading cursor
@@ -481,12 +496,12 @@ const SeriesCreate: React.FC = () => {
                                                }),
                                        }}
                                 >
-                                {isLoading ? (
+                                {isLoadingSub ? (
                                     <option>Loading...</option>
                                 ) : (
                                     <>
                                         <option value="">Select a category</option>
-                                        {subCategories.map((category, index) => (
+                                        {subCategories.map((category: Category, index: Key) => (
                                             <option key={index} value={category.value}>
                                                 {category.name}
                                             </option>

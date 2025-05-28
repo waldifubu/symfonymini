@@ -14,7 +14,10 @@ services:
       # Set the URL of your Symfony project (without trailing slash!) as value of the cors_origins directive
       # cors_origins *
       MERCURE_EXTRA_DIRECTIVES: |        
-        cors_origins https://localhost:8000 https://127.0.0.1:8000
+        cors_origins https://localhost:8000 https://127.0.0.1:8000        
+        publish_origins http://127.0.0.1:8000 https://localhost:8000
+        cookie_domain 127.0.0.1
+        subscriptions true
     # Comment the following line to disable the development mode
     command: /usr/bin/caddy run --config /etc/caddy/dev.Caddyfile
     healthcheck:

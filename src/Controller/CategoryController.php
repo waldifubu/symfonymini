@@ -26,7 +26,7 @@ class CategoryController extends AbstractController
             return new JsonResponse(['error' => 'Invalid category'], Response::HTTP_BAD_REQUEST);
         }
 
-        $method = $this->determeinMethodName($category);
+        $method = $this->determineMethodName($category);
 
         if (method_exists(SubCategoryEnum::class, $method)) {
             $jsonResponse = new JsonResponse(SubCategoryEnum::$method(), json: false);
@@ -34,12 +34,12 @@ class CategoryController extends AbstractController
             return $jsonResponse->setEncodingOptions(JSON_UNESCAPED_UNICODE);
         }
 
-        return new JsonResponse([SubCategoryEnum::NONE->name => SubCategoryEnum::NONE], json: false, status: Response::HTTP_OK);
+        return new JsonResponse([SubCategoryEnum::NONE->name => SubCategoryEnum::NONE], status: Response::HTTP_OK, json: false);
     }
 
-    public function determeinMethodName(string $categoryname): string
+    public function determineMethodName(string $category): string
     {
-        $str = str_replace('_', '', ucwords(strtolower($categoryname), '_'));
+        $str = str_replace('_', '', ucwords(strtolower($category), '_'));
         $str = ucfirst($str);
         return 'get' . $str;
     }
@@ -51,16 +51,6 @@ class CategoryController extends AbstractController
             return false;
         }
 
-        // Get all cases of the enum
-        $cases = $enumClass::cases();
-
-        // Check if the value exists in the enum cases
-        foreach ($cases as $case) {
-            if ($case->name === $value) {
-                return true;
-            }
-        }
-
-        return false;
+        return in_array($value, array_column($enumClass::cases(), 'name'), true);
     }
 }

@@ -67,7 +67,7 @@ const EpisodeCreate: React.FC = () => {
                         </FormGroup>
                         <FormGroup>
                             <Label for="description">
-                                <span id="description">Description</span>
+                                <span id="description">Description <sub>Text form</sub></span>
                             </Label>
                             <Input
                                 name="description"

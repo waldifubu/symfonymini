@@ -15,23 +15,23 @@
         "doctrine/orm": "^3.3.2",
         "fresh/doctrine-enum-bundle": "^10.1",
         "pentatrion/vite-bundle": "^8.0",
-        "symfony/console": "7.2.*",
-        "symfony/dotenv": "7.2.*",
+        "symfony/console": "7.3.*",
+        "symfony/dotenv": "7.3.*",
         "symfony/flex": "^2.4.7",
-        "symfony/form": "7.2.*",
-        "symfony/framework-bundle": "7.2.*",
+        "symfony/form": "7.3.*",
+        "symfony/framework-bundle": "7.3.*",
         "symfony/monolog-bundle": ">=3.10",
-        "symfony/runtime": "7.2.*",
-        "symfony/security-csrf": "7.2.*",
-        "symfony/uid": "7.2.*",
-        "symfony/validator": "7.2.*",
-        "symfony/yaml": "7.2.*"
+        "symfony/runtime": "7.3.*",
+        "symfony/security-csrf": "7.3.*",
+        "symfony/uid": "7.3.*",
+        "symfony/validator": "7.3.*",
+        "symfony/yaml": "7.3.*"
     },
     "require-dev": {
-        "symfony/debug-bundle": "7.2.*",
+        "symfony/debug-bundle": "7.3.*",
         "symfony/maker-bundle": "^1.62.1",
-        "symfony/stopwatch": "7.2.*",
-        "symfony/web-profiler-bundle": "7.2.*"
+        "symfony/stopwatch": "7.3.*",
+        "symfony/web-profiler-bundle": "7.3.*"
     },
     "config": {
         "allow-plugins": {
@@ -82,7 +82,7 @@
     "extra": {
         "symfony": {
             "allow-contrib": false,
-            "require": "7.2.*",
+            "require": "7.3.*",
             "docker": true
         }
     }

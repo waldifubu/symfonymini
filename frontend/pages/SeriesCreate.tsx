@@ -168,17 +168,23 @@ const SeriesCreate: React.FC = () => {
     }
 
     // Fetch subcategories with React Query (dependent query)
-    const { data: subCategories = [], isLoading: isLoadingSub } = useQuery<Category[]>({
+    const { data: subCategories = [], error, isLoading: isLoadingSub } = useQuery<Category[]>({
         queryKey: ['subCategories', selectedMainCategory],
         queryFn: async () => {
             const response = await axios.get(`/api/category/${selectedMainCategory}`);
             setIsLoading(false);
+            if (response.status !== 200) {
+                throw new Error('Network response was not ok')
+            }
             return Object.entries(response.data).map(([value, name]) => ({
                 value,
                 name: name as string,
             }));
         },
+        // The query will not execute until the userId exists
         enabled: !!selectedMainCategory, // Only fetch when main category is selected
+
+       /*
         onError: (error) => {
             Swal.fire({
                 icon: 'error',
@@ -187,6 +193,7 @@ const SeriesCreate: React.FC = () => {
             });
             setIsLoading(false);
         }
+        */
     });
 
     // Update main category select handler
@@ -557,26 +564,22 @@ const SeriesCreate: React.FC = () => {
                                         pill
                                     >
                                         FREQ=DAILY
-                                    </Badge>
-                                    means Daily
+                                    </Badge> means Daily
                                 </li>
                                 <li onClick={() => setFrequent('FREQ=WEEKLY')} style={frequencyListStyle}>
                                     <Badge color="info" pill>
                                         FREQ=WEEKLY
-                                    </Badge>
-                                    means Weekly
+                                    </Badge> means Weekly
                                 </li>
                                 <li onClick={() => setFrequent('FREQ=MONTHLY')} style={frequencyListStyle}>
                                     <Badge color="info" pill>
                                         FREQ=MONTHLY
-                                    </Badge>
-                                    means Monthly
+                                    </Badge> means Monthly
                                 </li>
                                 <li onClick={() => setFrequent('FREQ=YEARLY')} style={frequencyListStyle}>
                                     <Badge color="info" pill>
                                         FREQ=YEARLY
-                                    </Badge>
-                                    means Yearly
+                                    </Badge> means Yearly
                                 </li>
                                 <li onClick={() => setFrequent('FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR')}
                                     style={frequencyListStyle}>FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR means Monday to Friday

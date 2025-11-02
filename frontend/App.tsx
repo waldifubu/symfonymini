@@ -1,6 +1,6 @@
 import './components/app.css';
 import React, {lazy, Suspense} from 'react';
-import {BrowserRouter, createBrowserRouter, Outlet, Route, Routes, RouterProvider } from "react-router-dom";
+import {createBrowserRouter, Outlet, RouterProvider} from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import MyNavbar from "./components/MyNavbar";
 
@@ -70,8 +70,6 @@ const router = createBrowserRouter(
  */
 
 export const App = () => {
-    //const {name} = useGlobalContext();
-
     return (
         <div className="App">
             <header className="App-header">

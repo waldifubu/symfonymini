@@ -2,11 +2,13 @@
 
 namespace App\Security;
 
+use App\Service\MercureCookieGenerator;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\Security\Http\Authenticator\AbstractLoginFormAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge;
@@ -23,7 +25,9 @@ class AppAuthenticator extends AbstractLoginFormAuthenticator
 
     public function __construct(
         private readonly UrlGeneratorInterface $urlGenerator,
-        private readonly AuthenticationUtils $authenticationUtils)
+        private readonly AuthenticationUtils $authenticationUtils,
+        private MercureCookieGenerator $mercureCookieGenerator
+    )
     {
     }
 
@@ -48,12 +52,23 @@ class AppAuthenticator extends AbstractLoginFormAuthenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
+        /*
         if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
             return new RedirectResponse($targetPath);
         }
 
         // For example:
         return new RedirectResponse($this->urlGenerator->generate('app_home'));
+        */
+        $response = new RedirectResponse($this->urlGenerator->generate('conversation_browse'));
+
+        /** @var UserInterface $user */
+        $user = $token->getUser();
+
+        $cookie = $this->mercureCookieGenerator->create($user->getUserIdentifier());
+        $response->headers->setCookie($cookie);
+
+        return $response;
     }
 
     protected function getLoginUrl(Request $request): string

@@ -132,14 +132,14 @@
                 console.log(url);
 
                 // Append the topic(s) to subscribe as query parameter
-                // url.searchParams.append('topic', pathUri);
-                url.searchParams.append('topic', '/messages/{id}');
+                url.searchParams.append('topic', pathUri);
+                // url.searchParams.append('topic', '/messages/{id}');
 
                 // url.searchParams.append('topic', '/messages/3');
                 console.log('fetch = ' + pathUri);
 
                 // Subscribe to updates
-                const eventSource = new EventSource(url, {withCredentials: true });
+                const eventSource = new EventSource(url, {withCredentials: false });
 
                 eventSource.onerror = event => {
                     if (tmp.hasOpenenedFileLinkInFirefox) {

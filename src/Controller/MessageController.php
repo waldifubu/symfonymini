@@ -135,7 +135,7 @@ class MessageController extends AbstractController
             try {
                 $date = new \DateTime('now');
                 $update = new Update(
-                    '/messages/'.$groupConversation->getId(),
+                    ['/messages/'.$groupConversation->getId(), 'chat'],
                     // IRI, the topic being updated, can be any string usually URL
                     json_encode([
                         'conversation' => 'Nouveau message conversation :'.$groupConversation->getName(),

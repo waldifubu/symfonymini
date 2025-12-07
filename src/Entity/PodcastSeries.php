@@ -101,14 +101,14 @@ class PodcastSeries
     #[ORM\Column(length: 100, nullable: true)]
     private ?string $frequency = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $published = null;
+    #[ORM\Column(type: Types::STRING, nullable: true)]
+    private ?string $published = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $ownerEmail = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $lastBuildDate = null;
+    #[ORM\Column(type: Types::STRING, nullable: true)]
+    private ?string $lastBuildDate = null;
 
     #[ORM\Column(type: 'uuid', nullable: true)]
     private ?Uuid $uuid = null;
@@ -388,12 +388,12 @@ class PodcastSeries
         return $this;
     }
 
-    public function getPublished(): ?\DateTimeInterface
+    public function getPublished(): ?string
     {
         return $this->published;
     }
 
-    public function setPublished(?\DateTimeInterface $published): static
+    public function setPublished(?string $published): static
     {
         $this->published = $published;
 
@@ -412,12 +412,12 @@ class PodcastSeries
         return $this;
     }
 
-    public function getLastBuildDate(): ?\DateTimeInterface
+    public function getLastBuildDate(): ?string
     {
         return $this->lastBuildDate;
     }
 
-    public function setLastBuildDate(?\DateTimeInterface $lastBuildDate): static
+    public function setLastBuildDate(?string $lastBuildDate): static
     {
         $this->lastBuildDate = $lastBuildDate;
 

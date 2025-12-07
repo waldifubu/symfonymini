@@ -36,9 +36,6 @@ const SeriesCreate: React.FC = () => {
     const [tags, setTags] = React.useState<Tag[]>([]);
 
     const [cSelected, setCSelected] = useState([]);
-    // const [description, setDescription] = useState('')
-    // const [mainCategories, setMainCategories] = useState<Category[]>([])
-    // const [subCategories, setSubCategories] = useState<Category[]>([])
     const [selectedMainCategory, setSelectedMainCategory] = useState<string>("");
 
     const frequencyListStyle = {
@@ -86,23 +83,45 @@ const SeriesCreate: React.FC = () => {
         setTags([]);
     };
 
+    const normalizeValue = (value: string): string | boolean => {
+        if (value === "1") return true;
+        if (value === "0") return false;
+        return value;
+    };
+
+    const formDataToNormalizedJson: (formData: FormData) => string = (formData: FormData): string => {
+        const obj: Record<string, string | boolean> = {};
+
+        for (const [key, value] of formData.entries()) {
+
+            if (value instanceof File) {
+                throw new Error(
+                    `Cannot convert file field "${key}" to JSON. Use multipart/form-data instead.`
+                );
+            }
+
+            obj[key] = normalizeValue(value);
+        }
+
+        return JSON.stringify(obj);
+    };
+
     const handleSubmit = (e: any): void => {
         e.preventDefault()
-        const formData: FormData = new FormData(e.currentTarget)
+        const formData: FormData = new FormData(e.currentTarget);
         formData.append('locked', lockSelected ? '1' : '0')
         formData.append('blocked', blockSelected ? '1' : '0')
         formData.append('explicit', explicitSelected ? '1' : '0')
         formData.append('complete', completeSelected ? '1' : '0')
         formData.append('keywords', tags.map(tag => tag.text).join(', '))
 
-        // const tagsString = tags.map(tag => tag.text).join(', ');
-        // formData.append('keywords', tagsString)
+        const json = formDataToNormalizedJson(formData);
 
-        console.log([...formData.entries()])
-        // return;
-        // const newPodcast: { [p: string]: File | string } = Object.fromEntries(formData)
-        // console.log(refContainer.current?.value)
-        axios.post('/api/series', formData)
+        axios.post('/api/series', json, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
             .then(function (response) {
                 // console.log(response);
                 if (response.status === 201) {
@@ -119,44 +138,52 @@ const SeriesCreate: React.FC = () => {
                         icon: 'info',
                         title: response.statusText,
                         showConfirmButton: false,
-                        timer: 500
+                        timer: 1800
                     }).then(() => {
                         navigate('/')
                     });
                 }
-            }).catch(function (error) {
-            console.log(error.response.data)
-            Swal.fire({
-                icon: 'error',
-                title: error + ', Response: ' + error.response.data,
-                showConfirmButton: false,
-                timer: 3100
-            })
-        });
+            }).catch((error) => {
+                const apiErrors: any = error.response.data.errors
+                let message: string = ''
+                if (apiErrors) {
+                    message = buildErrorMessage(apiErrors);
+                }
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Response: ' + message,
+                    showConfirmButton: false,
+                    timer: 3100
+                })
+            }
+        );
     }
 
+    const buildErrorMessage = (errors: Record<string, string[]>): string => {
+        const messages: string[] = [];
+
+        for (const [field, fieldErrors] of Object.entries(errors)) {
+            for (const error of fieldErrors) {
+                messages.push(`${field}: ${error}`);
+            }
+        }
+
+        return messages.join("\n");
+    };
+
+
     // Fetch main categories with React Query
-    const { data: mainCategories = [], isLoading: isLoadingMain } = useQuery<Category[]>({
+    const {data: mainCategories = [], isLoading: isLoadingMain} = useQuery<Category[]>({
         queryKey: ['mainCategories'],
-        queryFn: async () => {
-            const response = await axios.get('/api/category');
-            return Object.entries(response.data).map(([value, name]) => ({
+        queryFn: async (): Promise<Category[]> => {
+            const response = await axios.get<Record<string, string>>('/api/category');
+            return Object.entries(response.data).map(([value, name]): Category => ({
                 value,
-                name: name as string,
+                name
             }));
         },
     });
-
-    /*
-    onError: (error) => {
-            Swal.fire({
-                icon: 'error',
-                title: 'Failed to load categories',
-                text: error.message,
-            });
-            return [];
-        }
-     */
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -168,32 +195,32 @@ const SeriesCreate: React.FC = () => {
     }
 
     // Fetch subcategories with React Query (dependent query)
-    const { data: subCategories = [], error, isLoading: isLoadingSub } = useQuery<Category[]>({
+    const {data: subCategories = [], error, isLoading: isLoadingSub} = useQuery<Category[]>({
         queryKey: ['subCategories', selectedMainCategory],
-        queryFn: async () => {
-            const response = await axios.get(`/api/category/${selectedMainCategory}`);
+        queryFn: async (): Promise<Category[]> => {
+            const response = await axios.get<Record<string, string>>(`/api/category/${selectedMainCategory}`);
             setIsLoading(false);
             if (response.status !== 200) {
                 throw new Error('Network response was not ok')
             }
-            return Object.entries(response.data).map(([value, name]) => ({
+            return Object.entries(response.data).map(([value, name]): Category => ({
                 value,
-                name: name as string,
+                name,
             }));
         },
         // The query will not execute until the userId exists
         enabled: !!selectedMainCategory, // Only fetch when main category is selected
 
-       /*
-        onError: (error) => {
-            Swal.fire({
-                icon: 'error',
-                title: 'Failed to load subcategories',
-                text: error.message,
-            });
-            setIsLoading(false);
-        }
-        */
+        /*
+         onError: (error) => {
+             Swal.fire({
+                 icon: 'error',
+                 title: 'Failed to load subcategories',
+                 text: error.message,
+             });
+             setIsLoading(false);
+         }
+         */
     });
 
     // Update main category select handler
@@ -249,9 +276,6 @@ const SeriesCreate: React.FC = () => {
         pubDate.value = date.toLocaleString('en-US', options);
     };
 
-    // @ts-ignore
-    // @ts-ignore
-    // @ts-ignore
     return (
         <Container>
             <Card>
@@ -261,7 +285,7 @@ const SeriesCreate: React.FC = () => {
                         <FormGroup>
                             <Label for="podcastTitle">
                                 <span id="podcastTitle">Podcast Title</span>
-                                <TooltipItem position={'bottom'} target={'podcastTitle'}
+                                <TooltipItem position={'bottom'} target="podcastTitle"
                                              text={'It’s important to have a clear, concise name for your podcast. Make your title specific. A show titled Our Community Bulletin is too vague to attract many subscribers, no matter how compelling the content.\n' +
                                                  '\n' +
                                                  'Pay close attention to the title as Apple Podcasts uses this field for search.\n' +
@@ -279,7 +303,7 @@ const SeriesCreate: React.FC = () => {
                         <FormGroup>
                             <Label for="description">
                                 <span id="description">Description</span>
-                                <TooltipItem position={'top'} target={'description'}
+                                <TooltipItem position={'top'} target="description"
                                              text={'Where description is text containing one or more sentences describing your podcast to potential listeners. The maximum amount of text allowed for this tag is 4000 bytes.\n' +
                                                  'To include links in your description or rich HTML, adhere to the following technical guidelines: enclose all portions of your XML that contain embedded HTML in a CDATA section to prevent formatting issues, and to ensure proper link functionality. For example:\n'
                                                  + '<![CDATA[<a href="http://www.example.com">Visit our website</a>]]>'}/>
@@ -292,9 +316,9 @@ const SeriesCreate: React.FC = () => {
                             />
                         </FormGroup>
                         <FormGroup>
-                            <Label for="author">
-                                <span id="author">Author</span>
-                                <TooltipItem position={'top'} target={'author'}
+                            <Label for="authorTip">
+                                <span id="authorTip">Author</span>
+                                <TooltipItem position={'top'} target="authorTip"
                                              text={'The group responsible for creating the show.\n' +
                                                  '\n' +
                                                  'Show author most often refers to the parent company or network of a podcast, but it can also be used to identify the host(s) if none exists.\n' +
@@ -309,11 +333,11 @@ const SeriesCreate: React.FC = () => {
                             />
                         </FormGroup>
 
-                        <div className={"d-flex justify-content-between"}>
+                        <div className={"d-flex justify-content-between flex-wrap"}>
                             <FormGroup>
                                 <Label for="locked">
                                     <span id="locked">Is locked? &nbsp;</span>
-                                    <TooltipItem position={'top'} target={'locked'}
+                                    <TooltipItem position={'top'} target="locked"
                                                  text={lockText}/>
                                 </Label>
 
@@ -323,9 +347,9 @@ const SeriesCreate: React.FC = () => {
                             </FormGroup>
 
                             <FormGroup>
-                                <span id="blocked">&nbsp; Is Blocked? &nbsp;</span>
+                                <span id="blocked">Is Blocked? &nbsp;</span>
                                 <Label for="blocked">
-                                    <TooltipItem position={'top'} target={'blocked'}
+                                    <TooltipItem position={'top'} target="blocked"
                                                  text={blockText}/>
                                 </Label>
 
@@ -336,8 +360,8 @@ const SeriesCreate: React.FC = () => {
 
                             <FormGroup>
                                 <Label for="explicit">
-                                    <span id="explicit">&nbsp; Is explicit? &nbsp;</span>
-                                    <TooltipItem position={'top'} target={'explicit'}
+                                    <span id="explicit">Is explicit? &nbsp;</span>
+                                    <TooltipItem position={'top'} target="explicit"
                                                  text={explicitText}/>
                                 </Label>
 
@@ -348,8 +372,8 @@ const SeriesCreate: React.FC = () => {
 
                             <FormGroup>
                                 <Label for="complete">
-                                    <span id="complete">&nbsp; Is complete? &nbsp;</span>
-                                    <TooltipItem position={'top'} target={'complete'}
+                                    <span id="complete">Is complete? &nbsp;</span>
+                                    <TooltipItem position={'top'} target="complete"
                                                  text={completeText}/>
                                 </Label>
 
@@ -374,7 +398,7 @@ const SeriesCreate: React.FC = () => {
                             <FormGroup className={"flex-fill me-2"}>
                                 <Label for="language">
                                     <span id="language">Language</span>
-                                    <TooltipItem position={'top'} target={'language'}
+                                    <TooltipItem position={'top'} target="language"
                                                  text={'Because Apple Podcasts is available in territories around the world, it is critical to specify the language of a podcast. Apple Podcasts only supports values from the ISO 639 list (two-letter language codes, with some possible modifiers, such as "fr-ca").\n' +
                                                      '\n' +
                                                      'Invalid language codes will cause your feed to fail Apple validation.'}/>
@@ -382,7 +406,6 @@ const SeriesCreate: React.FC = () => {
                                 <Input
                                     className="w-100"
                                     name="language"
-                                    placeholder="de-de"
                                     type="text"
                                 />
                             </FormGroup>
@@ -390,14 +413,14 @@ const SeriesCreate: React.FC = () => {
                             <FormGroup className={"flex-fill"}>
                                 <Label for="ttl">
                                     <span id="ttl">TTL</span>
-                                    <TooltipItem position={'top'} target={'ttl'}
+                                    <TooltipItem position={'top'} target="ttl"
                                                  text={'Element specifies the number of minutes the feed can stay cached before refreshing it from the source.'}/>
                                 </Label>
                                 <Input
                                     className={"w-100"}
                                     name="ttl"
                                     defaultValue="60"
-                                    type="text"
+                                    type="number"
                                 />
                             </FormGroup>
                         </div>
@@ -487,22 +510,22 @@ const SeriesCreate: React.FC = () => {
                             </Label>
                             <Input type="select" name="subCategory" id="subcategory" disabled={isLoading}
                                    style={{
-                                           // Base style (applies always)
-                                           color: "black",
-                                           // Conditional styles based on isLoading
-                                           ...(isLoadingSub
-                                               ? {
-                                                   color: "#ff0000", // Gray background when loading
-                                                   cursor: "wait", // Show loading cursor
-                                                   opacity: 0.7, // Fade appearance
-                                               }
-                                               : {
-                                                   // color: "black", // Normal text color
-                                                   // backgroundColor: "white", // Normal background
-                                                   // cursor: "default", // Default cursor
-                                               }),
-                                       }}
-                                >
+                                       // Base style (applies always)
+                                       color: "black",
+                                       // Conditional styles based on isLoading
+                                       ...(isLoadingSub
+                                           ? {
+                                               color: "#ff0000", // Gray background when loading
+                                               cursor: "wait", // Show loading cursor
+                                               opacity: 0.7, // Fade appearance
+                                           }
+                                           : {
+                                               // color: "black", // Normal text color
+                                               // backgroundColor: "white", // Normal background
+                                               // cursor: "default", // Default cursor
+                                           }),
+                                   }}
+                            >
                                 {isLoadingSub ? (
                                     <option>Loading...</option>
                                 ) : (
@@ -553,7 +576,6 @@ const SeriesCreate: React.FC = () => {
                             <Input
                                 id="frequency"
                                 name="frequency"
-                                placeholder="FREQ=MONTHLY"
                                 type="text"
                             />
                             Examples:
@@ -582,7 +604,10 @@ const SeriesCreate: React.FC = () => {
                                     </Badge> means Yearly
                                 </li>
                                 <li onClick={() => setFrequent('FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR')}
-                                    style={frequencyListStyle}>FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR means Monday to Friday
+                                    style={frequencyListStyle}>
+                                    <Badge color="info" pill>
+                                        FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR
+                                    </Badge> means Monday to Friday
                                 </li>
                                 <li onClick={() => setFrequent('FREQ=WEEKLY;BYDAY=MO,WE')}
                                     style={frequencyListStyle}>FREQ=WEEKLY;BYDAY=MO,WE means Monday and Wednesday
@@ -605,8 +630,7 @@ const SeriesCreate: React.FC = () => {
                                 <li onClick={() => setFrequent('true')} style={frequencyListStyle}>
                                     <Badge color="info" pill>
                                         true
-                                    </Badge>
-                                    means no more updates (completed or stopped)
+                                    </Badge> means no more updates (completed or stopped)
                                 </li>
                             </List>
 

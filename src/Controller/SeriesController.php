@@ -12,6 +12,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -49,41 +50,45 @@ final class SeriesController extends AbstractController
     }
 
     #[Route(name: 'app_series_create', methods: ['POST'])]
-    public function create(Request $request, EntityManagerInterface $entityManager, LoggerInterface $logger): Response
+    public function create(Request $request, EntityManagerInterface $entityManager, LoggerInterface $logger): JsonResponse
     {
-        $data = $request->request->all();
-        $series = new PodcastSeries();
+        try {
+            $data = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException $ex) {
+            return new JsonResponse(['error' => 'Invalid JSON'], 400);
+        }
 
-//        $data['mainCategory'] = $this->getEnumKeyFromValue($data['mainCategory'], MainCategoryEnum::class);
-//        $data['subCategory'] = $this->getEnumKeyFromValue($data['subCategory'], SubCategoryEnum::class);
-//        $data['mainCategory'] = MainCategoryEnum::from($data['mainCategory']);
-//        $data['subCategory'] = SubCategoryEnum::from($data['subCategory']);
-//        $data['published'] = new \DateTime($data['published']);
-//        unset($data['published']);
-        $form = $this->createForm(PodcastSeriesType::class, $series);
-//        $request->request->set('published', new \DateTime($data['published']));
-//        $request->request->set('mainCategory', $this->getEnumKeyFromValue($data['mainCategory'], MainCategoryEnum::class));
-//        $request->request->set('subCategory', $this->getEnumKeyFromValue($data['subCategory'], SubCategoryEnum::class));
-        $form->handleRequest($request);
-        $form->submit($request);
+        $form = $this->createForm(PodcastSeriesType::class, $series = new PodcastSeries());
+        $form->submit($data);
 
-        //dump($request->request->all());
-        $logger->info('create series', $request->request->all());
+        if (!$form->isValid()) {
+            return new JsonResponse([
+                'errors' => $this->getFormErrors($form),
+            ], 400);
+        }
 
-        if ($form->isSubmitted() && $form->isValid()) {
-//            $series->setCreated(new \DateTimeImmutable());
-//            $series->setUuid(Uuid::v4());
+        if ($form->isValid()) {
+            $series->setCreated(new \DateTimeImmutable());
+            $series->setUuid(Uuid::v4());
             $entityManager->persist($series);
-//            $entityManager->flush();
+            $entityManager->flush();
 
             return $this->json('Created', Response::HTTP_CREATED);
         }
 
-        $errors = $form->getErrors(true)->current()
-            ? $form->getErrors(true)->current()->getMessage()
-            : 'Invalid data';
+        return new JsonResponse([]);
+    }
 
-        return $this->json($errors, Response::HTTP_BAD_REQUEST);
+    private function getFormErrors($form): array
+    {
+        $errors = [];
+
+        foreach ($form->getErrors(true) as $error) {
+            $origin = $error->getOrigin()->getName();
+            $errors[$origin][] = $error->getMessage();
+        }
+
+        return $errors;
     }
 
     #[Route('/{id}', name: 'app_series_show', methods: ['GET'])]
@@ -94,10 +99,10 @@ final class SeriesController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_series_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Series $series, EntityManagerInterface $entityManager): Response
+    #[Route('/edit/{id}', name: 'app_series_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, PodcastSeries $series, EntityManagerInterface $entityManager): Response
     {
-        $form = $this->createForm(SeriesType::class, $series);
+        $form = $this->createForm(PodcastSeriesType::class, $series);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -106,9 +111,14 @@ final class SeriesController extends AbstractController
             return $this->redirectToRoute('app_series_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('series/edit.html.twig', [
-            'series' => $series,
-            'form' => $form,
+        return $this->json([
+            'id' => $series->getId(),
+            'title' => $series->getTitle(),
+            'author' => $series->getAuthor(),
+            'created' => $series->getCreated()?->format('Y-m-d H:i:s'),
+            'last' => $series->getLastBuildDate(),
+            'count' => $series->getEpisodes()->count(),
+
         ]);
     }
 
@@ -141,7 +151,7 @@ final class SeriesController extends AbstractController
         // Iterate through the cases and compare the value
         foreach ($cases as $case) {
             if ($case->name === $value) {
-                return $case->value; // Return the key (case name)
+                return $case; // Return the key (case name)
                 //return $case; // Return the key (case name)
             }
         }

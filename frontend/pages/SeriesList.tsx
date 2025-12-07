@@ -22,8 +22,8 @@ const SeriesList: React.FC = () => {
         last?: any;
     }
 
-    async function fetchSeriesList(): Promise<Series> {
-        const response: AxiosResponse<Series> = await axios.get('/api/series');
+    async function fetchSeriesList(): Promise<Series[]> {
+        const response: AxiosResponse<Series[]> = await axios.get('/api/series');
         return response.data;
     }
 
@@ -40,20 +40,19 @@ const SeriesList: React.FC = () => {
 
     // Use React Query to fetch data
     let {data: fetchedData, isLoading, error} = useQuery<Series[], Error>({
-        initialData: undefined,
         queryKey: ['series'],
         queryFn: fetchSeriesList
     });
 
     // Determine which data to use
-    const seriesList: Series[] | TQueryFnData | undefined = error ? fallbackSeriesList : fetchedData;
+    const seriesList: Series[] | undefined = error ? fallbackSeriesList : fetchedData;
 
     if (isLoading) {
         return (
             <Container>
                 <Card>
                     <CardHeader className="text-center">
-                        <h3>Loading series...</h3>
+                        <h3>Loading series. Please wait ...</h3>
                     </CardHeader>
                 </Card>
             </Container>
@@ -104,7 +103,7 @@ const SeriesList: React.FC = () => {
                                         </Link>
                                         <Link
                                             className="btn btn-outline-primary"
-                                            to="/episode/add"
+                                            to={`/series/edit/${series.id}`}
                                         >
                                             <FontAwesomeIcon icon={faEdit}/>
                                         </Link>

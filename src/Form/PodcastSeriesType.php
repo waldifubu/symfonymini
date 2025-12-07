@@ -4,11 +4,14 @@ namespace App\Form;
 
 use App\Entity\PodcastSeries;
 use App\Enum\Status;
+use Doctrine\DBAL\Types\BooleanType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\EnumType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use App\Enum\MainCategoryEnum;
@@ -22,13 +25,13 @@ class PodcastSeriesType extends AbstractType
             ->add('title')
             ->add('description')
             ->add('author')
-            ->add('locked')
-            ->add('blocked')
-            ->add('complete')
-            ->add('explicit')
-            ->add('copyright')
-            ->add('language')
-            ->add('cover')
+            ->add('locked', CheckboxType::class, ['required' => false])
+            ->add('blocked', CheckboxType::class, ['required' => false])
+            ->add('explicit', CheckboxType::class, ['required' => false])
+            ->add('complete', CheckboxType::class, ['required' => false])
+            ->add('copyright', TextType::class, ['required' => false])
+            ->add('language', TextType::class, ['required' => false])
+            ->add('cover', TextType::class, ['required' => false])
             ->add('type', ChoiceType::class, [
                 'choices' => [
                     'Episodic' => 'episodic',
@@ -42,24 +45,19 @@ class PodcastSeriesType extends AbstractType
             ->add('owner')
             ->add('ttl')
             ->add('frequency')
-            ->add('published', DateTimeType::class, [
-                'widget' => 'single_text',
-            ])
+            ->add('published')
             ->add('ownerEmail')
-            ->add('mainCategory', ChoiceType::class, [
-                'choices' => MainCategoryEnum::cases(), // Use enum cases as choices
-                // VALUue not needed?????
-//                'choice_value' => fn(?MainCategoryEnum $status): string => $status?->name ?? '',
+            ->add('mainCategory', EnumType::class, [
+                'class' => MainCategoryEnum::class,
+                'placeholder' => 'Choose a category',
+                'choice_value' => fn(?MainCategoryEnum $status): string => $status?->name ?? '',
                 'choice_label' => fn(MainCategoryEnum $enum): string => $enum->value,
-                'placeholder' => 'Select a category',
-                'multiple' => false,
-                'expanded' => false,
-                'empty_data' => null,
+                'required' => false,
             ])
             ->add('subCategory', ChoiceType::class, [
                 'choices' => SubCategoryEnum::cases(),
-//                'choice_value' => fn(?SubCategoryEnum $status): string => $status?->name ?? '',
-                'choice_label' => fn(SubCategoryEnum $enum):string => $enum->value,
+                'choice_value' => fn(?SubCategoryEnum $status): string => $status?->name ?? '',
+                'choice_label' => fn(SubCategoryEnum $enum): string => $enum->value,
                 'placeholder' => 'Select a category',
                 'multiple' => false,
                 'expanded' => false,
@@ -71,7 +69,7 @@ class PodcastSeriesType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'compound'   => true,
+            'compound' => true,
             'empty_data' => null,
             'csrf_protection' => false,
             'data_class' => PodcastSeries::class,

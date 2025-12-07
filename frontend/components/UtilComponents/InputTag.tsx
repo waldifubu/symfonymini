@@ -1,5 +1,5 @@
 import React from "react";
-import { WithContext as ReactTags, Tag } from "react-tag-input";
+import {KEYS, SEPARATORS, Tag, WithContext as ReactTags} from "react-tag-input";
 import "./inputTag.css";
 
 interface InputTagProps {
@@ -9,23 +9,15 @@ interface InputTagProps {
     onClearAll: () => void;
 }
 
-const KeyCodes = {
-    comma: 188,
-    enter: 13,
-};
-
-const delimiters = [KeyCodes.comma, KeyCodes.enter];
-
-const InputTag: React.FC<InputTagProps> = ({ tags, handleDelete, handleAddition, onClearAll }) => {
+const InputTag: React.FC<InputTagProps> = ({tags, handleDelete, handleAddition, onClearAll}: InputTagProps): React.JSX.Element => {
     return (
         <div id="tags">
             <ReactTags
                 tags={tags}
-                delimiters={delimiters}
+                separators={[SEPARATORS.ENTER, SEPARATORS.COMMA]}
                 handleDelete={handleDelete}
                 handleAddition={handleAddition}
                 inputFieldPosition="bottom"
-                autocomplete
                 allowDragDrop={true}
                 clearAll
                 onClearAll={onClearAll}

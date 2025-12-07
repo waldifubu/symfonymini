@@ -2,7 +2,6 @@ import React, {memo, useReducer} from "react";
 import {data} from "../pages/Example";
 import reducer from "./reducer";
 import {Button} from "reactstrap";
-import {REMOVE_ITEM} from "./actions";
 
 // @ts-ignore
 const MyList = ({people, removePerson}) => {

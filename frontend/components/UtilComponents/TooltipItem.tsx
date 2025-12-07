@@ -4,7 +4,6 @@ import {Tooltip} from "reactstrap";
 const TooltipItem = (props: any) => {
     const {position, target, text} = props;
     const [tooltipOpen, setTooltipOpen] = useState(false);
-
     const toggle = () => setTooltipOpen(!tooltipOpen);
 
     return (
@@ -14,7 +13,7 @@ const TooltipItem = (props: any) => {
                 isOpen={tooltipOpen}
                 target={target}
                 toggle={toggle}
-                transition={{ timeout: 100 }}
+                fade={false}
             >
         {text}
       </Tooltip>

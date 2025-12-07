@@ -83,7 +83,16 @@ const EpisodeCreate: React.FC = () => {
                                 type="textarea"
                             />
                         </FormGroup>
-                        <div className={"d-flex w-100"}>
+                        <div className={"d-inline-flex flex-wrap w-100"}>
+                            <FormGroup className={"flex-fill me-2"}>
+                                <Label for="no">
+                                    <span id="no">Episode No. (Number)</span>
+                                </Label>
+                                <Input
+                                    name="episode"
+                                    type="number"
+                                />
+                            </FormGroup>
                             <FormGroup className={"flex-fill me-2"}>
                                 <Label for="duration">
                                     <span id="duration">Duration in Sec.</span>
@@ -99,15 +108,6 @@ const EpisodeCreate: React.FC = () => {
                                 </Label>
                                 <Input
                                     name="fileLength"
-                                    type="number"
-                                />
-                            </FormGroup>
-                            <FormGroup>
-                                <Label for="episode">
-                                    <span id="episode">Episode No. (Number)</span>
-                                </Label>
-                                <Input
-                                    name="episode"
                                     type="number"
                                 />
                             </FormGroup>
@@ -129,7 +129,7 @@ const EpisodeCreate: React.FC = () => {
                             </Label>
                             <Input
                                 name="pubDate"
-                                type="datetime-local"
+                                type="date"
                             />
                         </FormGroup>
                         <FormGroup>

@@ -16,47 +16,30 @@ import {
 import {Link, useNavigate} from "react-router-dom";
 import Items from "./Items";
 import UserContainer from "./UserContainer";
-import podcastLogo from "../assets/favicon.png";
+// @ts-ignore
+import podcastLogo from "../assets/favicon.png"
 
 const MyNavbar = () => {
     const [isOpen, setIsOpen] = useState(false);
-    const toggle = () => setIsOpen(!isOpen);
+    const toggle: () => void = (): void => setIsOpen(!isOpen);
     const navigate = useNavigate();
-
-    function toPeople() {
-        navigate("/people");
-    }
-
-    function toPeopleOk() {
-        navigate("/people2");
-    }
-
-    function toBirthday() {
-        navigate("/birthday");
-    }
-
-    function toTours() {
-        navigate("/tours");
-    }
 
     return (
         <header>
-            <Navbar container="fluid" color="light" className="mb-1" expand="lg">
-                <NavbarBrand>
-                    <Link style={{color: 'inherit', textDecoration: 'none'}} to="/">
-                        <img style={{width: '30px'}} alt="Podcast logo" src={podcastLogo}/> Podcast Management
-                    </Link>
+            <Navbar container="fluid" color="light" className="mb-3" expand="lg">
+                <NavbarBrand tag={Link} to="/" style={{color: 'inherit', textDecoration: 'none'}}>
+                    <img style={{width: '30px'}} alt="Podcast logo" src={podcastLogo}/> Podcast Management
                 </NavbarBrand>
                 <NavbarToggler onClick={toggle}/>
                 <Collapse isOpen={isOpen} navbar>
                     <Nav className="me-auto" navbar>
                         <NavItem>
-                            <NavLink onClick={toPeople} style={{cursor: "pointer"}}>
+                            <NavLink onClick={() => navigate("/people")} style={{cursor: "pointer"}}>
                                 People broken
                             </NavLink>
                         </NavItem>
                         <NavItem>
-                            <NavLink onClick={toPeopleOk} style={{cursor: "pointer"}}>
+                            <NavLink onClick={() => navigate("/people2")} style={{cursor: "pointer"}}>
                                 People ok
                             </NavLink>
                         </NavItem>
@@ -66,12 +49,12 @@ const MyNavbar = () => {
                             </NavLink>
                         </NavItem>
                         <NavItem>
-                            <NavLink onClick={toBirthday} style={{cursor: "pointer"}}>
+                            <NavLink onClick={() => navigate("/birthday")} style={{cursor: "pointer"}}>
                                 Birthday reminder
                             </NavLink>
                         </NavItem>
                         <NavItem>
-                            <NavLink onClick={toTours} style={{cursor: "pointer"}}>
+                            <NavLink onClick={() => navigate("/tours")} style={{cursor: "pointer"}}>
                                 Tours
                             </NavLink>
                         </NavItem>

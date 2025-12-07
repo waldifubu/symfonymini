@@ -6,6 +6,8 @@ import MyNavbar from "./components/MyNavbar";
 
 const SeriesList: React.LazyExoticComponent<React.ComponentType<any>> = lazy(() => import("./pages/SeriesList"));
 const SeriesCreate: React.LazyExoticComponent<React.ComponentType<any>> = lazy(() => import ("./pages/SeriesCreate"));
+const SeriesEdit: React.LazyExoticComponent<React.ComponentType<any>> = lazy(() => import("./pages/SeriesEdit"));
+
 const People: React.LazyExoticComponent<React.ComponentType<any>> = lazy(() => import ("./pages/Example"));
 const People2: React.LazyExoticComponent<React.ComponentType<any>> = lazy(() => import ("./components/ExampleReducer"));
 const BirthdayReminder: React.LazyExoticComponent<React.ComponentType<any>> = lazy(() => import("./pages/BirthdayReminder"));
@@ -15,38 +17,42 @@ const EpisodeCreate: React.LazyExoticComponent<React.ComponentType<any>> = lazy(
 const routes = [
     {
         path: "/",
-        element: <Suspense fallback={<div>Laden ...</div>}><SeriesList/></Suspense>
+        element: <SeriesList/>
     },
     {
         path: "/create",
-        element: <Suspense fallback={<div>Laden ...</div>}><SeriesCreate/></Suspense>
+        element: <SeriesCreate/>
     },
     {
         path: "/people",
-        element: <Suspense fallback={<div>Laden ...</div>}><People/></Suspense>
+        element: <People/>
     },
     {
         path: "/people2",
-        element: <Suspense fallback={<div>Laden ...</div>}><People2/></Suspense>
+        element: <People2/>
     },
     {
         path: "/birthday",
-        element: <Suspense fallback={<div>Loading</div>}><BirthdayReminder/></Suspense>
+        element: <BirthdayReminder/>
     },
     {
         path: "/tours",
-        element: <Suspense fallback={<div>Loading</div>}><Tours/></Suspense>
+        element: <Tours/>
     },
     {
         path: "/episode/add/:id",
-        element: <Suspense fallback={<div>Loading</div>}><EpisodeCreate/></Suspense>
+        element: <EpisodeCreate/>
+    },
+    {
+        path: "/series/edit/:id",
+        element: <SeriesEdit/>
     }
 
 ]
 
 const router = createBrowserRouter([
     {
-        element: <><MyNavbar/><Outlet/></>,
+        element: <><MyNavbar/><Suspense fallback={<div>Loading</div>}><Outlet/></Suspense></>,
         children: routes
     },
 ]);

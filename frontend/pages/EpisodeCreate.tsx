@@ -1,6 +1,7 @@
 import React, {ChangeEvent, FC, useState} from "react";
 import {
     Alert,
+    Button,
     Card,
     CardBody,
     CardHeader,
@@ -198,25 +199,29 @@ const EpisodeCreate: React.FC = () => {
                             />
                         </FormGroup>
 
+                        <Button type={"submit"} color="primary">
+                            Create
+                        </Button>
                     </Form>
                 </CardBody>
             </Card>
 
-
             <Row className={"mt-2"}>
                 <Col>
                     <Card className="">
-                        <CardHeader>Cover</CardHeader>
+                        <CardHeader><h5>Cover upload</h5></CardHeader>
                         <CardBody>
-                        <DropUpload/>
+                            <DropUpload/>
                         </CardBody>
                     </Card>
                 </Col>
 
                 <Col>
                     <Card className="">
-                        File
-                        <br/><br/><br/><br/>
+                        <CardHeader><h5>File upload</h5></CardHeader>
+                        <CardBody>
+                            <DropUpload/>
+                        </CardBody>
                     </Card>
                 </Col>
             </Row>

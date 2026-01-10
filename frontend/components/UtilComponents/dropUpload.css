@@ -1,16 +1,126 @@
+ul {
+  list-style-type: none;
+  width: 500px;
+  margin: 0 auto;
+  padding: 0 20px;
+
+  & li {
+    text-align: left;
+    display: grid;
+    justify-content: space-between;
+    position: relative;
+    line-height: 1.4em;
+    margin: 15px 0;
+    gap: 20px;
+
+    & p {
+      margin: 0;
+      white-space: nowrap;
+      /*overflow: hidden;*/
+      text-overflow: ellipsis;
+    }
+  }
+
+  & li::before {
+    content: "📁";
+    position: absolute;
+    left: -32px;
+    top: 8px;
+  }
+}
+
+progress {
+  width: 300px;
+  margin: 20px 0 0;
+}
+
+#dropArea.highlight {
+  border-color: #007aff;
+}
+
 #dropArea {
-    margin: 0 auto;
+  margin: 0 auto;
 
-    border: 2px dashed transparent;
-    background: #fff;
-    border-radius: 10px;
-    width: 500px;
-    padding: 20px 20px 30px;
+  border: 2px dashed transparent;
+  background: #fff;
+  border-radius: 15px;
+  width: 100%;
+  padding: 20px 20px 30px;
 
-    background: radial-gradient(
-            100% 400% at 100% 50%,
-            #fff 0%,
-            rgb(233, 171, 255) 40%,
-            rgb(150, 173, 255) 80%
-    ) right 0% / 400% 100% no-repeat;
+  background: radial-gradient(
+          100% 400% at 100% 50%,
+          #fff 0%,
+          rgb(233, 171, 255) 40%,
+          rgb(150, 173, 255) 80%
+  ) right 0% / 400% 100% no-repeat;
+}
+
+input[type="file"]::file-selector-button {
+  margin: 0 20px 10px 0;
+}
+
+input[type="file"] {
+  color: #999;
+  width: 250px;
+}
+
+button, input[type="file"] {
+  display: block;
+  margin: 20px auto;
+  font-size: 16px;
+}
+
+.bold {
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+button:disabled, button:disabled:hover {
+  background: #ddd;
+  border-color: #777;
+  color: #313131;
+  cursor: auto;
+}
+
+button,  input[type="file"]::file-selector-button {
+  padding: 8px 16px;
+  background: #000;
+  cursor: pointer;
+  border-radius: 5px;
+  border: 1px solid #000;
+  color: #fff;
+}
+
+button:hover, input[type="file"]::file-selector-button:hover {
+  background: #313131;
+  transition: all 1s ease;
+}
+
+#submit {
+  transition: transform 1s ease;
+}
+
+#submit.grow {
+  /*background: orangered;*/
+  animation: gradientShift 1s forwards;
+  transform: scale(1.1);
+}
+
+/* Keyframes für den Farbverlauf */
+@keyframes gradientShift {
+  0% {
+    background: linear-gradient(0deg, orangered, black);
+  }
+  25% {
+    background: linear-gradient(15deg, orangered, black);
+  }
+  50% {
+    background: linear-gradient(30deg, orangered, black);
+  }
+  75% {
+    background: linear-gradient(45deg, orangered, black);
+  }
+  100% {
+    background: linear-gradient(90deg, black, orangered);
+  }
 }

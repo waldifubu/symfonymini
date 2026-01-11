@@ -298,6 +298,7 @@ const SeriesCreate: React.FC = () => {
                                 placeholder=""
                                 type="text"
                                 innerRef={refContainer}
+                                required={true}
                             />
                         </FormGroup>
                         <FormGroup>
@@ -313,6 +314,7 @@ const SeriesCreate: React.FC = () => {
                                    name="description"
                                    placeholder=""
                                    type="textarea"
+                                   required={true}
                             />
                         </FormGroup>
                         <FormGroup>

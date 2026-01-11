@@ -36,7 +36,16 @@
         ]
     },
     "fresh/doctrine-enum-bundle": {
-        "version": "v10.1.0"
+        "version": "12.0",
+        "recipe": {
+            "repo": "github.com/symfony/recipes-contrib",
+            "branch": "main",
+            "version": "6.0",
+            "ref": "fab86661c13bc12e4f14f706c86af09912d55bfb"
+        },
+        "files": [
+            "./src/DBAL/Types/.gitignore"
+        ]
     },
     "pentatrion/vite-bundle": {
         "version": "7.0",

@@ -1,0 +1,110 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}PodcastSeries{% endblock %}
+
+{% block body %}
+    <h1>PodcastSeries</h1>
+
+    <table class="table table-striped">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ podcast_series.id }}</td>
+            </tr>
+            <tr>
+                <th>Title</th>
+                <td>{{ podcast_series.title }}</td>
+            </tr>
+            <tr>
+                <th>Description</th>
+                <td>{{ podcast_series.description }}</td>
+            </tr>
+            <tr>
+                <th>Author</th>
+                <td>{{ podcast_series.author }}</td>
+            </tr>
+            <tr>
+                <th>Locked</th>
+                <td>{{ podcast_series.locked ? 'Yes' : 'No' }}</td>
+            </tr>
+            <tr>
+                <th>Explicit</th>
+                <td>{{ podcast_series.explicit ? 'Yes' : 'No' }}</td>
+            </tr>
+            <tr>
+                <th>Copyright</th>
+                <td>{{ podcast_series.copyright }}</td>
+            </tr>
+            <tr>
+                <th>Language</th>
+                <td>{{ podcast_series.language }}</td>
+            </tr>
+            <tr>
+                <th>Created</th>
+                <td>{{ podcast_series.created ? podcast_series.created|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Cover</th>
+                <td>{{ podcast_series.cover }}</td>
+            </tr>
+            <tr>
+                <th>Type</th>
+                <td>{{ podcast_series.type }}</td>
+            </tr>
+            <tr>
+                <th>Owner</th>
+                <td>{{ podcast_series.owner }}</td>
+            </tr>
+            <tr>
+                <th>Keywords</th>
+                <td>{{ podcast_series.keywords }}</td>
+            </tr>
+            <tr>
+                <th>Blocked</th>
+                <td>{{ podcast_series.blocked ? 'Yes' : 'No' }}</td>
+            </tr>
+            <tr>
+                <th>Complete</th>
+                <td>{{ podcast_series.complete ? 'Yes' : 'No' }}</td>
+            </tr>
+            <tr>
+                <th>MainCategory</th>
+                <td>{{ podcast_series.mainCategory.value ?? '' }}</td>
+            </tr>
+            <tr>
+                <th>SubCategory</th>
+                <td>{{ podcast_series.subCategory.value ?? '' }}</td>
+            </tr>
+            <tr>
+                <th>Ttl</th>
+                <td>{{ podcast_series.ttl }}</td>
+            </tr>
+            <tr>
+                <th>Frequency</th>
+                <td>{{ podcast_series.frequency }}</td>
+            </tr>
+            <tr>
+                <th>Published</th>
+                <td>{{ podcast_series.published ? podcast_series.published|date('Y-m-d') : '' }}</td>
+            </tr>
+            <tr>
+                <th>OwnerEmail</th>
+                <td>{{ podcast_series.ownerEmail }}</td>
+            </tr>
+            <tr>
+                <th>LastBuildDate</th>
+                <td>{{ podcast_series.lastBuildDate ? podcast_series.lastBuildDate|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Uuid</th>
+                <td>{{ podcast_series.uuid }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_podcast_series_index') }}">back to list</a>
+
+    <a href="{{ path('app_podcast_series_edit', {'id': podcast_series.id}) }}">edit</a>
+
+    {{ include('podcast_series/_delete_form.html.twig') }}
+{% endblock %}

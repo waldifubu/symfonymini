@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css"/>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.min.js"></script>
+{% endblock %}
+
+{% block title %}New PodcastSeries{% endblock %}
+
+{% block body %}
+    <h1>Create new PodcastSeries</h1>
+
+    <div class="container">
+    {{ include('podcast_series/_form.html.twig') }}
+    </div>
+
+    <a href="{{ path('app_podcast_series_index') }}">back to list</a>
+{% endblock %}

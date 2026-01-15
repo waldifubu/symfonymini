@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit PodcastSeries{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h1>Edit PodcastSeries</h1>
+
+        {{ include('podcast_series/_form.html.twig', {'button_label': 'Update'}) }}
+
+        <a href="{{ path('app_podcast_series_index') }}">back to list</a>
+
+        {{ include('podcast_series/_delete_form.html.twig') }}
+    </div>
+{% endblock %}

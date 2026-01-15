@@ -1,0 +1,15 @@
+<style>
+    body, button {
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+        line-height: 1.6;
+        color: #FFFFFF;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+    }
+</style>
+{{ form_start(form) }}
+    {{ form_widget(form) }}
+<button class="btn btn-primary">{{ button_label|default('Save') }}</button>
+{{ form_end(form) }}

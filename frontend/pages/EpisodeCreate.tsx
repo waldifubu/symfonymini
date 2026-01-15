@@ -17,13 +17,16 @@ import {
 import MyButtonGroup from "../components/UtilComponents/MyButtonGroup";
 import InputTag from "../components/UtilComponents/InputTag";
 import {Tag} from "react-tag-input";
-import DropUpload from "../components/UtilComponents/DropUpload";
+import DropUpload, {FileMetadata} from "../components/UtilComponents/DropUpload";
 
 const EpisodeCreate: React.FC = () => {
     const [typeSelected, setTypeSelected] = useState('');
     const [isTypeOpen, setTypeIsOpen] = useState(false);
     const [explicitSelected, setExplicitSelected] = useState(false);
     const [tags, setTags] = React.useState<Tag[]>([]);
+    const [coverUrl, setCoverUrl] = React.useState<string>("");
+    const [fileUrl, setFileUrl] = React.useState<string>("");
+    const [duration, setDuration] = React.useState<string>("");
 
     function showInfo(value: string) {
         setTypeIsOpen(value !== '');
@@ -37,6 +40,19 @@ const EpisodeCreate: React.FC = () => {
         }
     }
 
+    const handleCoverChange = (metadata: FileMetadata[]): void => {
+        if (metadata.length > 0) {
+            const coverData: FileMetadata = metadata[0];
+            setCoverUrl(coverData.url);
+        }
+    };
+
+    const handleRadioplayChange = (metadata: FileMetadata[]): void => {
+        if (metadata.length > 0) {
+            const radioplayData: FileMetadata = metadata[0];
+            // setCoverUrl(coverData.url);
+        }
+    };
 
     const handleDelete = (i: number) => {
         setTags(tags.filter((tag, index) => index !== i));
@@ -56,6 +72,28 @@ const EpisodeCreate: React.FC = () => {
                 <CardHeader><h2>New Episode</h2></CardHeader>
                 <CardBody>
                     <Form method="post" autoComplete="on">
+                        <div className={"d-inline-flex flex-wrap w-50"}>
+                            <FormGroup className={"flex-fill me-2"}>
+                                <Label for="no">
+                                    <span id="no">Episode No. (Number)</span>
+                                </Label>
+                                <Input
+                                    name="episode"
+                                    type="number"
+                                />
+                            </FormGroup>
+
+                            <FormGroup className={"flex-grow-0"}>
+                                <Label for="explicit">
+                                    <span id="explicit">Is explicit?</span>
+                                </Label>
+                                <br/>
+                                <MyButtonGroup className={"mt-0"} funcPos={() => setExplicitSelected(true)}
+                                               funcNeg={() => setExplicitSelected(false)}
+                                               value={explicitSelected}/>
+                            </FormGroup>
+                        </div>
+
                         <FormGroup>
                             <Label for="episodeTitle">
                                 <span id="episodeTitle">Episode Title</span>
@@ -84,45 +122,6 @@ const EpisodeCreate: React.FC = () => {
                                 type="textarea"
                             />
                         </FormGroup>
-                        <div className={"d-inline-flex flex-wrap w-100"}>
-                            <FormGroup className={"flex-fill me-2"}>
-                                <Label for="no">
-                                    <span id="no">Episode No. (Number)</span>
-                                </Label>
-                                <Input
-                                    name="episode"
-                                    type="number"
-                                />
-                            </FormGroup>
-                            <FormGroup className={"flex-fill me-2"}>
-                                <Label for="duration">
-                                    <span id="duration">Duration in Sec.</span>
-                                </Label>
-                                <Input
-                                    name="duration"
-                                    type="number"
-                                />
-                            </FormGroup>
-                            <FormGroup className={"flex-fill me-2"}>
-                                <Label for="filesize">
-                                    <span id="filesize">Filesize in Bytes</span>
-                                </Label>
-                                <Input
-                                    name="fileLength"
-                                    type="number"
-                                />
-                            </FormGroup>
-                            <FormGroup className={"flex-grow-0 ms-2"}>
-                                <Label for="explicit">
-                                    <span id="explicit">Is explicit?</span>
-                                </Label>
-                                <br/>
-
-                                <MyButtonGroup funcPos={() => setExplicitSelected(true)}
-                                               funcNeg={() => setExplicitSelected(false)}
-                                               value={explicitSelected}/>
-                            </FormGroup>
-                        </div>
 
                         <FormGroup>
                             <Label for="published">
@@ -133,24 +132,7 @@ const EpisodeCreate: React.FC = () => {
                                 type="date"
                             />
                         </FormGroup>
-                        <FormGroup>
-                            <Label for="fileUrl">
-                                <span id="fileUrl">File URL</span>
-                            </Label>
-                            <Input
-                                name="fileUrl"
-                                type="text"
-                            />
-                        </FormGroup>
-                        <FormGroup>
-                            <Label for="coverUrl">
-                                <span id="coverUrl">Cover Url</span>
-                            </Label>
-                            <Input
-                                name="coverUrl"
-                                type="number"
-                            />
-                        </FormGroup>
+
                         <FormGroup>
                             <Label for="keywords">
                                 Keywords
@@ -199,6 +181,51 @@ const EpisodeCreate: React.FC = () => {
                             />
                         </FormGroup>
 
+                        <FormGroup>
+                            <Label for="coverUrl">
+                                <span id="coverUrl">Cover Url</span>
+                            </Label>
+                            <Input
+                                name="coverUrl"
+                                value={coverUrl}
+                                type="text"
+                            />
+                        </FormGroup>
+
+                        <FormGroup>
+                            <Label for="fileUrl">
+                                <span id="fileUrl">File URL</span>
+                            </Label>
+                            <Input
+                                name="fileUrl"
+                                type="text"
+                                value={fileUrl}
+                            />
+                        </FormGroup>
+
+                        <div className={"d-inline-flex flex-wrap w-100"}>
+                            <FormGroup className={"flex-fill me-2"}>
+                                <Label for="filesize">
+                                    <span id="filesize">Filesize in Bytes</span>
+                                </Label>
+                                <Input
+                                    name="fileLength"
+                                    type="number"
+                                />
+                            </FormGroup>
+                            <FormGroup className={"flex-fill me-2"}>
+                                <Label for="duration">
+                                    <span id="duration">Duration in Sec.</span>
+                                </Label>
+                                <Input
+                                    name="duration"
+                                    type="number"
+                                    value={duration}
+                                />
+                            </FormGroup>
+                        </div>
+
+
                         <Button type={"submit"} color="primary">
                             Create
                         </Button>
@@ -211,7 +238,8 @@ const EpisodeCreate: React.FC = () => {
                     <Card className="">
                         <CardHeader><h5>Cover upload</h5></CardHeader>
                         <CardBody>
-                            <DropUpload/>
+                            {/* Pass fileMetadata as prop and receive updates via callback */}
+                            <DropUpload onFilesUploaded={handleCoverChange}/>
                         </CardBody>
                     </Card>
                 </Col>
@@ -220,7 +248,7 @@ const EpisodeCreate: React.FC = () => {
                     <Card className="">
                         <CardHeader><h5>File upload</h5></CardHeader>
                         <CardBody>
-                            <DropUpload/>
+                            <DropUpload onFilesUploaded={handleRadioplayChange}/>
                         </CardBody>
                     </Card>
                 </Col>

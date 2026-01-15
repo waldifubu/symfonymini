@@ -1,11 +1,15 @@
 import "./dropUpload.css"
-import React, {ChangeEvent, DragEvent, FormEvent, useRef, useState} from 'react';
+import React, {ChangeEvent, DragEvent, FormEvent, useEffect, useRef, useState} from 'react';
+import {Button, ButtonGroup, Input} from "reactstrap";
 
-interface FileMetadata {
+export interface FileMetadata {
+    url: string;
     name: string;
     type: string;
     size: number;
     uuid: string;
+    storage?: string;
+    duration?: number;
 }
 
 interface UploadResponse {
@@ -13,19 +17,41 @@ interface UploadResponse {
     uuid: string;
     type: string;
     size: number;
+    url: string;
+    duration?: number;
     message?: string;
+    storage?: string;
 }
 
-const DropUpload: React.FC = () => {
+// Props interface for the component
+interface DropUploadProps {
+    onFilesUploaded?: (metadata: FileMetadata[]) => void; // Callback to update parent
+}
+
+interface SourceOption {
+    value: string;
+    label: string;
+}
+
+const DropUpload: React.FC<DropUploadProps> = ({onFilesUploaded}: DropUploadProps) => {
     // State management
     const [files, setFiles] = useState<FileList | null>(null);
-    const lastValidFilesRef = useRef<FileList | null>(null); // Store last valid selection
+    const lastValidFilesRef = useRef<FileList | null>(null);
     const [path, setPath] = useState<string>('');
     const [statusMessage, setStatusMessage] = useState<string>("🤷‍♂ Nothing's uploaded");
     const [progress, setProgress] = useState<number>(0);
     const [fileMetadata, setFileMetadata] = useState<FileMetadata[]>([]);
     const [isDragOver, setIsDragOver] = useState<boolean>(false);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [selectedSource, setSelectedSource] = useState<string>('h3');
+
+    const sources = [
+        { value: 'h3', label: 'H3' },
+        { value: 'terabox', label: 'Terabox' },
+        { value: 'filenio', label: 'Filen.io' },
+        { value: 'google-cloud', label: 'Google Cloud' }
+    ];
 
     // Refs for direct DOM access if needed
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -34,7 +60,7 @@ const DropUpload: React.FC = () => {
 
     // Configuration
     const ALLOWED_TYPES = ["image/webp", "image/jpeg", "image/png", "audio/mpeg"];
-    const SIZE_LIMIT = 1024 * 1024 * 1024 * 9999999024 * 99999999999; // 1 megabyte
+    const SIZE_LIMIT = 1024 * 1024 * 1024 * 9999999024 * 99999999999;
     const UPLOAD_URL = "/api/file_upload";
 
     // Handle form submission
@@ -47,7 +73,6 @@ const DropUpload: React.FC = () => {
         }
 
         try {
-            // assertFilesValid(files);
             showPendingState();
             await uploadFiles(files);
         } catch (err: any) {
@@ -57,17 +82,25 @@ const DropUpload: React.FC = () => {
 
     // Handle file input change
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-        // Only update state if user actually selected files
         if (e.target.files && e.target.files.length > 0) {
-            // Convert FileList to array and update state
-            setFiles(e.target.files);
-            lastValidFilesRef.current = e.target.files;
+            const fileList = e.target.files;
+            setFiles(fileList);
+            lastValidFilesRef.current = fileList;
+
+            // Create preview for first file if it's an image
+            if (fileList[0] && fileList[0].type.startsWith('image/')) {
+                const url = URL.createObjectURL(fileList[0]);
+                setPreviewUrl(url);
+            } else {
+                // Clear preview if not an image
+                if (previewUrl) {
+                    URL.revokeObjectURL(previewUrl);
+                }
+                setPreviewUrl(null);
+            }
         } else {
-            // If no files but we had previous selection, keep it
-            if (null!= lastValidFilesRef.current && lastValidFilesRef.current.length > 0) {
+            if (null != lastValidFilesRef.current && lastValidFilesRef.current.length > 0) {
                 console.log('Dialog canceled - keeping previous selection');
-                lastValidFilesRef.current = e.target.files;
-                // Files state already contains last valid selection
             } else {
                 resetFormState();
             }
@@ -86,9 +119,17 @@ const DropUpload: React.FC = () => {
         resetFormState();
 
         try {
-            // assertFilesValid(fileList);
             setFiles(fileList);
+            lastValidFilesRef.current = fileList;
             updateStatusMessage(`📄 ${fileList.length} file(s) selected from drop`);
+
+            // Create preview for first file if it's an image
+            if (fileList[0] && fileList[0].type.startsWith('image/')) {
+                const url = URL.createObjectURL(fileList[0]);
+                setPreviewUrl(url);
+            } else {
+                setPreviewUrl(null);
+            }
 
             // Trigger button animation
             const button = event.currentTarget.querySelector('button');
@@ -102,6 +143,15 @@ const DropUpload: React.FC = () => {
             updateStatusMessage(err.message);
         }
     };
+
+    // Clean up object URLs when component unmounts or preview changes
+    useEffect(() => {
+        return () => {
+            if (previewUrl) {
+                URL.revokeObjectURL(previewUrl);
+            }
+        };
+    }, [previewUrl]);
 
     // Upload files to server
     const uploadFiles = async (fileList: FileList) => {
@@ -143,30 +193,10 @@ const DropUpload: React.FC = () => {
             formData.append("file", fileList[i]);
         }
         formData.append("path", path);
+        formData.append("storage", selectedSource);
 
         xhr.open("POST", UPLOAD_URL);
         xhr.send(formData);
-    };
-
-    // Validate files
-    const assertFilesValid = (fileList: FileList) => {
-        return;
-        for (let i = 0; i < fileList.length; i++) {
-            const file = fileList[i];
-
-            // Skip type validation as per your condition
-            if (false && !ALLOWED_TYPES.includes(file.type)) {
-                throw new Error(
-                    `❌ File "${file.name}" could not be uploaded. Only images with the following types are allowed: WEBP, JPEG, PNG.`
-                );
-            }
-
-            if (file.size > SIZE_LIMIT) {
-                throw new Error(
-                    `❌ File "${file.name}" could not be uploaded. Only images up to 1 MB are allowed.`
-                );
-            }
-        }
     };
 
     // Update status message
@@ -188,7 +218,11 @@ const DropUpload: React.FC = () => {
     // Reset form state
     const resetFormState = () => {
         setFileMetadata([]);
-        // Do not reset the file input value or files state here
+        // Clear preview URL when resetting
+        if (previewUrl) {
+            URL.revokeObjectURL(previewUrl);
+            setPreviewUrl(null);
+        }
         setIsSubmitting(false);
         updateStatusMessage("🤷‍♂ Nothing's uploaded");
         updateProgressBar(0);
@@ -203,10 +237,16 @@ const DropUpload: React.FC = () => {
                 name: response.name,
                 type: response.type,
                 size: response.size,
-                uuid: response.uuid
+                uuid: response.uuid,
+                url: response.url,
+                duration: response.duration,
+                storage: response.storage
             });
         }
         setFileMetadata(metadata);
+        if (onFilesUploaded) {
+            onFilesUploaded(metadata);
+        }
     };
 
     // Drag and drop event handlers
@@ -230,7 +270,19 @@ const DropUpload: React.FC = () => {
     // Calculate progress percentage
     const progressPercent = (progress * 100).toFixed(2);
 
-    // @ts-ignore
+    // Function to clear the preview
+    const clearPreview = () => {
+        if (previewUrl) {
+            URL.revokeObjectURL(previewUrl);
+            setPreviewUrl(null);
+        }
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+        setFiles(null);
+        lastValidFilesRef.current = null;
+    };
+
     return (
         <div>
             <form ref={formRef} onSubmit={handleSubmit}>
@@ -243,32 +295,101 @@ const DropUpload: React.FC = () => {
                     onDragLeave={handleDragLeave}
                     onDrop={handleDrop}
                 >
+                    <div className="d-inline-flex">
+                        <label className="form-label">Storage:</label>
+                        <ButtonGroup className="w-100">
+                            {sources.map((source) => (
+                                <Button
+                                    key={source.value}
+                                    color={selectedSource === source.value ? 'primary' : 'outline-primary'}
+                                    active={selectedSource === source.value}
+                                    onClick={() => setSelectedSource(source.value )}
+                                    className="flex-grow-1"
+                                >
+                                    {source.label}
+                                </Button>
+                            ))}
+                        </ButtonGroup>
+                    </div>
+                    <div className="mb-2">
+                        <small className="text-muted">
+                            Selected: {sources.find(opt => opt.value === selectedSource)?.label}
+                        </small>
+                    </div>
+
+
                     <p>Drag and drop files here or</p>
-                    <input
+                    <Input
                         type="file"
-                        ref={fileInputRef}
+                        innerRef={fileInputRef}
                         onChange={handleFileChange}
-                        style={{display: 'block', margin: '10px auto'}}
+                        style={{display: 'block', margin: '10px auto', padding: '14px 12px'}}
                     />
 
-                    <div style={{margin: '20px 0'}}>
-                        <label htmlFor="pathInput">Upload Path:</label>
-                        <input
+                    {/* Image Preview Section */}
+                    {previewUrl && (
+                        <div style={{margin: '20px 0', textAlign: 'center'}}>
+                            <h5>Image Preview:</h5>
+                            <div style={{position: 'relative', display: 'inline-block'}}>
+                                <img
+                                    src={previewUrl}
+                                    alt="Preview"
+                                    style={{
+                                        maxWidth: '300px',
+                                        maxHeight: '300px',
+                                        objectFit: 'contain'
+                                    }}
+                                    //onLoad={() => console.log('Image loaded successfully')}
+                                    onError={() => {
+                                        console.error('Failed to load image preview');
+                                        setPreviewUrl(null);
+                                    }}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={clearPreview}
+                                    style={{
+                                        position: 'absolute',
+                                        top: '5px',
+                                        right: '5px',
+                                        background: 'rgba(255, 0, 0, 0.7)',
+                                        color: 'white',
+                                        border: 'none',
+                                        borderRadius: '50%',
+                                        width: '24px',
+                                        height: '24px',
+                                        cursor: 'pointer'
+                                    }}
+                                >
+                                    ×
+                                </button>
+                            </div>
+                            <p style={{fontSize: '12px', color: '#666', marginTop: '5px'}}>
+                                Click the X to remove the preview
+                            </p>
+                        </div>
+                    )}
+
+                    <div style={{margin: '20px auto'}} className={"d-flex"}>
+                        <label className={"mt-2 me-2"} htmlFor="pathInput">Upload Path:</label>
+                        <Input
+                            className={"w-50"}
+                            name="duration"
                             type="text"
                             id="pathInput"
                             value={path}
                             onChange={(e) => setPath(e.target.value)}
                             placeholder="Enter upload path"
+                            required={true}
                         />
                     </div>
                 </div>
 
-
                 <button
                     type="submit"
-                    // disabled={isSubmitting || !files || files.length === 0}
+                    disabled={isSubmitting || !files || files.length === 0}
                 >
-                    {isSubmitting ? 'Uploading...' : 'Upload Files'}
+                    {isSubmitting ? 'Uploading...' : 'Upload File'}
                 </button>
             </form>
 
@@ -288,39 +409,18 @@ const DropUpload: React.FC = () => {
                     >{progressPercent}%
                     </div>
                 </div>
-
-
-                {/*
-                <div
-                    id="progri"
-                    style={{
-                        width: `${progressPercent}%`,
-                        height: '20px',
-                        backgroundColor: '#4CAF50',
-                        transition: 'width 0.3s',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: 'white',
-                        fontWeight: 'bold'
-                    }}
-                >
-
-                    {progressPercent}%
-                </div>
-                */}
             </div>
 
             <div style={{margin: '20px 0'}}>
-                {/* ({fileMetadata.length} files) */}
                 <h3>File Metadata:</h3>
-                <ul id="fileListMetadata" style={{listStyle: 'none', padding: 0}}>
+                <ul id="fileListMetadata" style={{listStyle: 'none', padding: 0, paddingLeft: '20px'}}>
                     {fileMetadata.map((file, index) => (
                         <li key={index} style={{borderBottom: '1px solid #ccc', padding: '10px 0'}}>
                             <p><strong>Name:</strong> {file.name}</p>
                             <p><strong>Type:</strong> {file.type}</p>
                             <p><strong>Size:</strong> {file.size} bytes</p>
                             <p><strong>UUID:</strong> {file.uuid}</p>
+                            <p><strong>URL:</strong> {file.url}</p>
                         </li>
                     ))}
                 </ul>

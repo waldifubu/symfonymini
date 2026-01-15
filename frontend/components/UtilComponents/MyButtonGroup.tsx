@@ -2,11 +2,12 @@ import {Button, ButtonGroup} from "reactstrap";
 import React from "react";
 
 const MyButtonGroup = (props: any) => {
-    const {funcPos, funcNeg, value} = props;
+    const {funcPos, funcNeg, value, className} = props;
 
     return (
         <ButtonGroup>
             <Button
+                className={className}
                 name="blocked"
                 color="success"
                 outline
@@ -16,6 +17,7 @@ const MyButtonGroup = (props: any) => {
                 Yes
             </Button>
             <Button
+                className={className}
                 name="blocked"
                 color="danger"
                 outline

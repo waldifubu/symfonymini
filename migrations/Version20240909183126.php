@@ -20,9 +20,9 @@ final class Version20240909183126 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('CREATE TABLE episode (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, series_id INTEGER NOT NULL, title VARCHAR(255) DEFAULT NULL, summary CLOB DEFAULT NULL, description CLOB DEFAULT NULL, published DATETIME DEFAULT NULL, duration INTEGER DEFAULT NULL, episode_nr INTEGER DEFAULT NULL, CONSTRAINT FK_DDAA1CDA5278319C FOREIGN KEY (series_id) REFERENCES series (id) NOT DEFERRABLE INITIALLY IMMEDIATE)');
-        $this->addSql('CREATE INDEX IDX_DDAA1CDA5278319C ON episode (series_id)');
-        $this->addSql('CREATE TABLE series (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, title VARCHAR(255) NOT NULL, author VARCHAR(255) DEFAULT NULL)');
+//        $this->addSql('CREATE TABLE episode (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, series_id INTEGER NOT NULL, title VARCHAR(255) DEFAULT NULL, summary CLOB DEFAULT NULL, description CLOB DEFAULT NULL, published DATETIME DEFAULT NULL, duration INTEGER DEFAULT NULL, episode_nr INTEGER DEFAULT NULL, CONSTRAINT FK_DDAA1CDA5278319C FOREIGN KEY (series_id) REFERENCES series (id) NOT DEFERRABLE INITIALLY IMMEDIATE)');
+//        $this->addSql('CREATE INDEX IDX_DDAA1CDA5278319C ON episode (series_id)');
+//        $this->addSql('CREATE TABLE series (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, title VARCHAR(255) NOT NULL, author VARCHAR(255) DEFAULT NULL)');
         /*
          * CREATE TABLE series (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, title VARCHAR(255) NOT NULL, author VARCHAR(255) DEFAULT NULL);
 CREATE TEMPORARY TABLE __temp__podcast_series AS SELECT id, title, description, author, locked, explicit, copyright, language, created, cover, type, owner, keywords, blocked, complete, main_category, sub_category, ttl, frequency, published, owner_email, last_build_date, uuid FROM podcast_series;

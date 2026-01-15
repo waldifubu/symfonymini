@@ -4,17 +4,59 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Entity\Media;
+use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpKernel\Attribute\ValueResolver;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Uid\Uuid;
 
 class FileController extends AbstractController
 {
+    #[Route('/files/{uuid}', name: 'file_load')]
+    public function loadFile(
+//        #[MapEntity(mapping: ['uuid' => 'uuid'])] Media $media
+        #[ValueResolver('uuid')] Media $media
+    ): Response
+    {
+        $url = $media->getPath();
+
+        //$path = sprintf('%s/uploads/%s', $this->getParameter('kernel.project_dir'), $url);
+        $path = $url;
+
+        // Detect MIME type using native finfo
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->file($path) ?: 'application/octet-stream';
+
+        $response = new StreamedResponse(static function () use ($path) {
+            $handle = fopen($path, 'rb');
+
+            while (!feof($handle)) {
+                echo fread($handle, 32192);   // stream in chunks
+                flush();
+            }
+
+            fclose($handle);
+        });
+
+        // Headers
+        $response->headers->set('Content-Type', $mimeType);
+        $response->headers->set('Content-Length', (string)filesize($path));
+        $response->headers->set('Content-Disposition', 'inline; filename="' . basename($path) . '"');
+        $response->setMaxAge(3600);
+
+        return $response;
+    }
+
+
     #[Route('/api/file_upload', name: 'file_upload')]
-    public function index(Request $request): Response
+    public function uploadFile(Request $request, EntityManagerInterface $entityManager): Response
     {
         //return $this->render('file/index.html.twig');
         error_reporting(E_ALL);
@@ -134,11 +176,24 @@ class FileController extends AbstractController
             throw new \RuntimeException('Failed to save file');
         }
 
+        $realUUID = new Uuid($batchUUID);
+        $url = $this->generateUrl('file_load', ['uuid' => $realUUID], UrlGeneratorInterface::ABSOLUTE_URL);
+
+        $media = new Media();
+        $media->setUuid($batchUUID);
+        $media->setType($fileType);
+        $media->setSize($fileSize);
+        $media->setUrl($url);
+        $media->setPath($targetPath);
+        $entityManager->persist($media);
+        $entityManager->flush();
+
         $callbackData = [
             'uuid' => $batchUUID,
             'size' => $fileSize,
             'type' => $fileType,
             'name' => $fileName,
+            'url' => $url
         ];
 
         return $this->json($callbackData, Response::HTTP_CREATED);
@@ -152,7 +207,6 @@ class FileController extends AbstractController
 
         return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
     }
-
 
     public function sanitizeFilename($filename)
     {

@@ -50,7 +50,7 @@ progress {
   background: radial-gradient(
           100% 400% at 100% 50%,
           #fff 0%,
-          rgb(233, 171, 255) 40%,
+          rgb(228, 222, 222) 40%,
           rgb(150, 173, 255) 80%
   ) right 0% / 400% 100% no-repeat;
 }

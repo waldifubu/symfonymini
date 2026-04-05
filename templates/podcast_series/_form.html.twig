@@ -1,15 +1,23 @@
 <style>
     body, button {
-        font-family: Arial, sans-serif;
+        font-family: Roboto, sans-serif;
         font-size: 14px;
         line-height: 1.6;
-        color: #FFFFFF;
-        background-color: #f4f4f4;
+        /*color: #FFFFFF;*/
+        /*background-color: #f4f4f4;*/
         margin: 0;
         padding: 0;
     }
 </style>
-{{ form_start(form) }}
+{% set current_route = app.request.attributes.get('route') %}
+{{ form_start(form, {
+    attr: {
+        'data-controller': 'subcategory',
+        'data-subcategory-url-value': path('app_category_show', {'category' : 'PLACEHOLDER'}),
+        'data-subcategory-route-value': current_route
+    }}) }}
     {{ form_widget(form) }}
 <button class="btn btn-primary">{{ button_label|default('Save') }}</button>
 {{ form_end(form) }}
+
+

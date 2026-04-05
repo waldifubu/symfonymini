@@ -71,7 +71,11 @@ class PodcastSeries
      * @var Collection<int, PodcastEpisode>
      */
     #[ORM\OneToMany(targetEntity: PodcastEpisode::class, mappedBy: 'series', fetch: 'LAZY')]
-    private Collection $episodes;
+    public Collection $episodes {
+        get {
+            return $this->episodes;
+        }
+    }
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $type = null;
@@ -112,6 +116,9 @@ class PodcastSeries
 
     #[ORM\Column(type: 'uuid', nullable: true)]
     private ?Uuid $uuid = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $bucket = null;
 
     public function __construct()
     {
@@ -236,14 +243,6 @@ class PodcastSeries
         $this->cover = $cover;
 
         return $this;
-    }
-
-    /**
-     * @return Collection<int, PodcastEpisode>
-     */
-    public function getEpisodes(): Collection
-    {
-        return $this->episodes;
     }
 
     public function addEpisode(PodcastEpisode $episode): static
@@ -432,6 +431,18 @@ class PodcastSeries
     public function setUuid(Uuid $uuid): static
     {
         $this->uuid = $uuid;
+
+        return $this;
+    }
+
+    public function getBucket(): ?string
+    {
+        return $this->bucket;
+    }
+
+    public function setBucket(?string $bucket): static
+    {
+        $this->bucket = $bucket;
 
         return $this;
     }

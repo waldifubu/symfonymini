@@ -20,7 +20,7 @@ class SpaController extends AbstractController
 
 
 //    #[Route('/', name: 'app_home', requirements: ['reactRouting' => '^(?!api).+'])]
-    #[Route('/{reactRouting}', name: 'app_home', requirements: ['reactRouting' => '^(?!api|home).+'], defaults: ['reactRouting' => null])]
+    #[Route('/{reactRouting}', name: 'app_home', requirements: ['reactRouting' => '^(?!api|home|podcast|assets).+'], defaults: ['reactRouting' => null])]
     public function index(): Response
     {
         return $this->render('spa/index.html.twig');

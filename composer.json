@@ -15,7 +15,11 @@
         "doctrine/doctrine-migrations-bundle": "^3.7.0",
         "doctrine/orm": "^3.6.1",
         "fresh/doctrine-enum-bundle": "^v12.0.1",
-        "pentatrion/vite-bundle": "^v8.2.3",
+        "google/cloud-storage": "^1.49",
+        "guzzlehttp/guzzle": "^7.10",
+        "james-heinrich/getid3": "^1.9",
+        "pentatrion/vite-bundle": "^v8.2.4",
+        "symfony/asset-mapper": "8.0.*",
         "symfony/console": "8.0.*",
         "symfony/dotenv": "8.0.*",
         "symfony/expression-language": "8.0.*",
@@ -25,15 +29,18 @@
         "symfony/monolog-bundle": ">=v4.0.1",
         "symfony/runtime": "8.0.*",
         "symfony/security-csrf": "8.0.*",
+        "symfony/stimulus-bundle": "^2.32",
         "symfony/uid": "8.0.*",
         "symfony/validator": "8.0.*",
         "symfony/yaml": "8.0.*"
     },
     "require-dev": {
+        "rector/rector": "^2.4",
         "symfony/debug-bundle": "8.0.*",
-        "symfony/maker-bundle": "^v1.65.1",
+        "symfony/maker-bundle": "*",
         "symfony/stopwatch": "8.0.*",
-        "symfony/web-profiler-bundle": "8.0.*"
+        "symfony/web-profiler-bundle": "8.0.*",
+        "symplify/config-transformer": "^12.4"
     },
     "config": {
         "allow-plugins": {
@@ -72,7 +79,8 @@
     "scripts": {
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
-            "assets:install %PUBLIC_DIR%": "symfony-cmd"
+            "assets:install %PUBLIC_DIR%": "symfony-cmd",
+            "importmap:install": "symfony-cmd"
         },
         "post-install-cmd": [
             "@auto-scripts"

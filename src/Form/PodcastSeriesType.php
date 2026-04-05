@@ -53,6 +53,10 @@ class PodcastSeriesType extends AbstractType
                 'choice_value' => fn(?MainCategoryEnum $status): string => $status?->name ?? '',
                 'choice_label' => fn(MainCategoryEnum $enum): string => $enum->value,
                 'required' => false,
+                'attr' => [
+                    'data-action' => 'change->subcategory#load input->subcategory#load',
+                    'data-subcategory-target' => 'category',
+                ],
             ])
             ->add('subCategory', ChoiceType::class, [
                 'choices' => SubCategoryEnum::cases(),
@@ -62,6 +66,9 @@ class PodcastSeriesType extends AbstractType
                 'multiple' => false,
                 'expanded' => false,
                 'empty_data' => null,
+                'attr' => [
+                    'data-subcategory-target' => 'subcategory'
+                ],
             ])
             ->add('keywords');
     }

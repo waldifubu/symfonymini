@@ -12,6 +12,26 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+/*
+{
+    'episode': '1',
+    'title': 'title',
+    'description': 'desc',
+    'content': 'content',
+    'pubDate': '2025-12-11',
+    'episodeType': 'full',
+    'author': 'author',
+    'tags': 'true crime, and other cool stuff., and so on, well, here',
+    'coverUrl': 'https://127.0.0.1:8000/files/876f06e3-939c-428a-a095-fd442b3df006',
+    'fileUrl': 'https://127.0.0.1:8000/files/ffc85605-2e6f-4b3f-8768-c1d44058292e',
+    'fileLength': '16885942',
+    'duration': '422',
+    'coverId': '876f06e3-939c-428a-a095-fd442b3df006',
+    'radioplayId': 'ffc85605-2e6f-4b3f-8768-c1d44058292e'
+}
+ */
+
+
 #[Route('/podcast/series')]
 final class PodcastSeriesController extends AbstractController
 {

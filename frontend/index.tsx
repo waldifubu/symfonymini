@@ -22,12 +22,12 @@ const queryClient = new QueryClient({
 
 // Creates Context provider which uses a certain context (GlobalContext)
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-    <StrictMode>
+    // <StrictMode>
         <AppContext>
             <QueryClientProvider client={queryClient}>
                 <App/>
             </QueryClientProvider>
         </AppContext>
-    </StrictMode>
+    // </StrictMode>
 );
 

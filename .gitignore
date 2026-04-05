@@ -14,3 +14,12 @@
 /public/build/
 ###< pentatrion/vite-bundle ###
 /uploads/
+
+###> symfony/asset-mapper ###
+/public/assets/
+/assets/vendor/
+###< symfony/asset-mapper ###
+
+###> phpstan/phpstan ###
+phpstan.neon
+###< phpstan/phpstan ###

@@ -13,12 +13,13 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[InheritanceType('SINGLE_TABLE')]
 #[DiscriminatorColumn(name: 'discr', type: 'string', length: 30)]
 #[DiscriminatorMap(['cover' => Cover::class, 'radioplay' => Radioplay::class])]
+#[ORM\HasLifecycleCallbacks]
 class File
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
+    protected ?int $id = null;
 
     public function getId(): ?int
     {
@@ -27,28 +28,28 @@ class File
 
     #[Assert\Uuid]
     #[ORM\Column(length: 80, unique: true)]
-    private ?string $uuid = null;
+    protected ?string $uuid = null;
 
     #[ORM\Column]
-    private ?\DateTime $created = null;
+    protected ?\DateTime $created = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $url = null;
+    protected ?string $url = null;
 
     #[ORM\ManyToOne]
-    private ?PodcastEpisode $episode = null;
+    protected ?PodcastEpisode $episode = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    private ?string $type = null;
+    protected ?string $type = null;
 
     #[ORM\Column(nullable: true)]
-    private ?int $size = null;
+    protected ?int $size = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $path = null;
+    protected ?string $path = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    private ?string $storage = null;
+    protected ?string $storage = null;
 
     public function getUuid(): ?string
     {
@@ -128,5 +129,11 @@ class File
     public function setStorage(?string $storage): void
     {
         $this->storage = $storage;
+    }
+
+    #[ORM\PrePersist]
+    public function prePersist(): void
+    {
+        $this->created = new \DateTime();
     }
 }

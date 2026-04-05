@@ -10,4 +10,16 @@ class Radioplay extends File
 {
     #[ORM\Column(nullable: true)]
     private ?int $duration = null;
+
+    public function getDuration(): ?int
+    {
+        return $this->duration;
+    }
+
+    public function setDuration(?int $duration): void
+    {
+        $this->duration = $duration;
+    }
+
+
 }

@@ -23,6 +23,7 @@ const routes = [
         path: "/create",
         element: <SeriesCreate/>
     },
+    /*
     {
         path: "/people",
         element: <People/>
@@ -31,6 +32,7 @@ const routes = [
         path: "/people2",
         element: <People2/>
     },
+     */
     {
         path: "/birthday",
         element: <BirthdayReminder/>

@@ -40,7 +40,7 @@ final class SeriesController extends AbstractController
                 'author' => $project->getAuthor(),
                 'created' => $project->getCreated(),
                 'last' => $project->getLastBuildDate(),
-                'count' => $project->getEpisodes()->count(),
+                'count' => $project->episodes->count(),
             ];
         }
 
@@ -90,10 +90,17 @@ final class SeriesController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_series_show', methods: ['GET'])]
-    public function show(Series $series): Response
+    public function show(PodcastSeries $series): Response
     {
-        return $this->render('series/show.html.twig', [
-            'series' => $series,
+        return $this->json([
+            'id' => $series->getId(),
+            'title' => $series->getTitle(),
+            'author' => $series->getAuthor(),
+            'created' => $series->getCreated()?->format('Y-m-d H:i:s'),
+            'last' => $series->getLastBuildDate(),
+            'count' => $series->episodes->count(),
+            'cover' => $series->getCover(),
+            'bucket' => $series->getBucket() ?? ''
         ]);
     }
 
@@ -115,7 +122,7 @@ final class SeriesController extends AbstractController
             'author' => $series->getAuthor(),
             'created' => $series->getCreated()?->format('Y-m-d H:i:s'),
             'last' => $series->getLastBuildDate(),
-            'count' => $series->getEpisodes()->count(),
+            'count' => $series->episodes->count(),
 
         ]);
     }

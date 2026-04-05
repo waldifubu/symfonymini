@@ -1,6 +1,6 @@
 #tags {
     width: 100%;
-    margin: 20px auto;
+    margin: 0 auto;
 }
 
 #tags .ReactTags__tags {
@@ -9,6 +9,7 @@
     align-items: center;
     background-color: #f9f9f9;
     padding: 1px 5px;
+    margin: 0;
 }
 
 #tags .ReactTags__selected {
@@ -25,12 +26,13 @@
 }
 
 #tags .ReactTags__tagInput {
-    border-radius: 2px;
-    display: inline-block;
+    border-radius: 4px;
+    display: inline-flex;
+    flex-grow: 1;
 }
 
 #tags .ReactTags__tagInput input.ReactTags__tagInputField, #tags .ReactTags__tagInput input.ReactTags__tagInputField:focus {
-    height: 32px;
+    height: 44px;
     margin: 0;
     font-size: 14px;
     min-width: 190px;
@@ -52,8 +54,8 @@
     font-size: 12px;
     display: flex;
     padding: 5px;
-    margin: 10px 1px;
-    border-radius: 2px;
+    margin: 6px 1px;
+    border-radius: 4px;
 }
 
 #tags .ReactTags__selected a.ReactTags__remove {
@@ -95,7 +97,9 @@
     cursor: pointer;
     background: none;
     color: white;
-    margin-left: 5px;
+    margin: 0 0 0 5px;
+    padding: 0;
+
 }
 
 #tags input {
@@ -106,4 +110,9 @@
 
 #tags input:before {
     border: none;
+}
+
+#tags button .ReactTags__remove {
+    margin: 0;
+    padding: 0;
 }

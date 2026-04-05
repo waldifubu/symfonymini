@@ -1,12 +1,12 @@
-{% extends 'base.html.twig' %}
+{% extends 'podcast_series/base.html.twig' %}
 
 {% block title %}PodcastSeries{% endblock %}
 
 {% block body %}
-    <h1>PodcastSeries</h1>
-
-    <table class="table table-striped">
-        <tbody>
+    <div class="container">
+        <h1>PodcastSeries</h1>
+        <table class="table table-striped">
+            <tbody>
             <tr>
                 <th>Id</th>
                 <td>{{ podcast_series.id }}</td>
@@ -99,8 +99,9 @@
                 <th>Uuid</th>
                 <td>{{ podcast_series.uuid }}</td>
             </tr>
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    </div>
 
     <a href="{{ path('app_podcast_series_index') }}">back to list</a>
 

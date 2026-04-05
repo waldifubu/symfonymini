@@ -70,7 +70,7 @@ const SeriesCreate: React.FC = () => {
         value: string;
         name: string;
     }
-
+/*
     const handleDelete = (i: number) => {
         setTags(tags.filter((tag, index) => index !== i));
     };
@@ -82,7 +82,7 @@ const SeriesCreate: React.FC = () => {
     const onClearAll = () => {
         setTags([]);
     };
-
+*/
     const normalizeValue = (value: string): string | boolean => {
         if (value === "1") return true;
         if (value === "0") return false;
@@ -317,7 +317,9 @@ const SeriesCreate: React.FC = () => {
                                    required={true}
                             />
                         </FormGroup>
-                        <FormGroup>
+
+                        <div className={"d-flex w-100"}>
+                            <FormGroup className={"flex-fill me-2"}>
                             <Label for="authorTip">
                                 <span id="authorTip">Author</span>
                                 <TooltipItem position={'top'} target="authorTip"
@@ -334,6 +336,19 @@ const SeriesCreate: React.FC = () => {
                                 type="text"
                             />
                         </FormGroup>
+
+                        <FormGroup className={"flex-fill"}>
+                            <Label for="bucket">
+                                <span id="bucket">Preferred Bucketname</span>
+                            </Label>
+                            <Input
+                                className={"w-100"}
+                                name="bucket"
+                                placeholder=""
+                                type="text"
+                            />
+                        </FormGroup>
+                        </div>
 
                         <div className={"d-flex justify-content-between flex-wrap"}>
                             <FormGroup>
@@ -551,10 +566,12 @@ const SeriesCreate: React.FC = () => {
                             <p>
                                 Example: <samp>crime, thriller, mystery, detective, maritim, radio play...</samp></p>
                             <InputTag
+                                name="keywords"
                                 tags={tags}
-                                handleDelete={handleDelete}
-                                handleAddition={handleAddition}
-                                onClearAll={onClearAll}
+                                setTags={setTags}
+                                // handleDelete={handleDelete}
+                                // handleAddition={handleAddition}
+                                // onClearAll={onClearAll}
                             />
                         </FormGroup>
 

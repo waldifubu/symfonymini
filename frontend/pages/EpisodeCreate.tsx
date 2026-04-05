@@ -1,4 +1,4 @@
-import React, {ChangeEvent, FC, useState} from "react";
+import React, {ChangeEvent, FC, Suspense, use, useActionState, useRef, useState} from "react";
 import {
     Alert,
     Button,
@@ -12,12 +12,17 @@ import {
     FormGroup,
     Input,
     Label,
-    Row
+    Row,
+    Spinner
 } from "reactstrap";
 import MyButtonGroup from "../components/UtilComponents/MyButtonGroup";
 import InputTag from "../components/UtilComponents/InputTag";
 import {Tag} from "react-tag-input";
 import DropUpload, {FileMetadata} from "../components/UtilComponents/DropUpload";
+import {useParams} from 'react-router-dom';
+import {handleSubmit, EpisodeActionState} from "../actions/EpisodeCreateAction";
+import {ErrorBoundary} from "react-error-boundary";
+import {Series} from "../types/Series";
 
 const EpisodeCreate: React.FC = () => {
     const [typeSelected, setTypeSelected] = useState('');
@@ -27,8 +32,15 @@ const EpisodeCreate: React.FC = () => {
     const [coverUrl, setCoverUrl] = React.useState<string>("");
     const [fileUrl, setFileUrl] = React.useState<string>("");
     const [duration, setDuration] = React.useState<string>("");
+    const [filesize, setFilesize] = React.useState<string>("");
+    const [series, setSeries] = React.useState<any>(null);
+    const {id} = useParams(); // Get id from route params
+    const formRef = useRef(null);
+    const [bucket, setBucket] = React.useState<string>("");
+    const [coverUuid, setCoverUuid] = React.useState<string>("");
+    const [radioplayUuid, setRadioplayUuid] = React.useState<string>("");
 
-    function showInfo(value: string) {
+    const showInfo = (value: string) => {
         setTypeIsOpen(value !== '');
 
         if (value == 'full') {
@@ -44,34 +56,73 @@ const EpisodeCreate: React.FC = () => {
         if (metadata.length > 0) {
             const coverData: FileMetadata = metadata[0];
             setCoverUrl(coverData.url);
+            setCoverUuid(coverData.uuid);
         }
     };
 
     const handleRadioplayChange = (metadata: FileMetadata[]): void => {
         if (metadata.length > 0) {
             const radioplayData: FileMetadata = metadata[0];
-            // setCoverUrl(coverData.url);
+            if (radioplayData.duration !== undefined) {
+                setDuration(radioplayData?.duration?.toString());
+            }
+            setFilesize(radioplayData.size.toString());
+            setFileUrl(radioplayData.url);
+            setRadioplayUuid(radioplayData.uuid);
         }
     };
 
-    const handleDelete = (i: number) => {
-        setTags(tags.filter((tag, index) => index !== i));
-    };
+    const ShowSeriesInfo: React.FC<{ seriesPromise: Promise<Series> }> = ({seriesPromise}) => {
+        const series: Series = use(seriesPromise);
+        return <h3 className="text-muted">{series.title} ({series.count} episodes)</h3>;
+    }
 
-    const handleAddition = (tag: Tag) => {
-        setTags([...tags, tag]);
-    };
+    const ShowBucket = ({seriesPromise}: { seriesPromise: Promise<Series> }) => {
+        const series: Series = use(seriesPromise);
+        setBucket(series.bucket);
+        //return series.bucket;
+    }
 
-    const onClearAll = () => {
-        setTags([]);
-    };
+    const [state, formAction, isPending] = useActionState<EpisodeActionState | null, FormData>(handleSubmit.bind(null, id), null);
+
+    const loadSeriesData = (): Promise<Series> | undefined => {
+        if (!id) return undefined;
+        document.body.classList.add('body-loading');
+        return fetch(`/api/series/${id}/`)
+            .then(response => response.json() as Promise<Series>)
+            .then(data => {
+                setBucket(data.bucket);
+                return data;
+            })
+            .catch(error => {
+                console.error('Error fetching series:', error);
+                throw error;
+            }).finally(() => {
+                document.body.classList.remove('body-loading');
+            });
+    }
+
+    const seriesData = loadSeriesData();
 
     return (
         <Container>
+            <title>New Episode</title>
+            <meta name="description"
+                  content="Create a new episode for your series. Fill out the form with the episode details, upload your audio file and cover image, and publish your episode to share it with your audience."/>
             <Card>
-                <CardHeader><h2>New Episode</h2></CardHeader>
+                <CardHeader>
+                    <div className="d-flex justify-content-between align-items-end">
+                        <h2>New Episode</h2>
+                        <ErrorBoundary fallback={<div>Error loading series info</div>}>
+                            <Suspense fallback={<div><Spinner size={"md"} color={"primary"}></Spinner> Loading series info...</div>}>
+                                {seriesData && <ShowSeriesInfo seriesPromise={seriesData}/>}
+                            </Suspense>
+                        </ErrorBoundary>
+                    </div>
+                </CardHeader>
                 <CardBody>
-                    <Form method="post" autoComplete="on">
+                    {/*onSubmit={handleSubmit4}*/}
+                    <Form action={formAction} autoComplete="on" ref={formRef}>
                         <div className={"d-inline-flex flex-wrap w-50"}>
                             <FormGroup className={"flex-fill me-2"}>
                                 <Label for="no">
@@ -80,6 +131,7 @@ const EpisodeCreate: React.FC = () => {
                                 <Input
                                     name="episode"
                                     type="number"
+                                    value={series ? (series.count + 1) : 1}
                                 />
                             </FormGroup>
 
@@ -99,6 +151,7 @@ const EpisodeCreate: React.FC = () => {
                                 <span id="episodeTitle">Episode Title</span>
                             </Label>
                             <Input
+                                required={true}
                                 id="inputTitle"
                                 name="title"
                                 type="text"
@@ -109,6 +162,7 @@ const EpisodeCreate: React.FC = () => {
                                 <span id="description">Description <sub>Text form</sub></span>
                             </Label>
                             <Input
+                                required={true}
                                 name="description"
                                 type="textarea"
                             />
@@ -118,6 +172,7 @@ const EpisodeCreate: React.FC = () => {
                                 <span id="content">Content  - Like description, but with HTML</span>
                             </Label>
                             <Input
+                                required={true}
                                 name="content"
                                 type="textarea"
                             />
@@ -128,6 +183,7 @@ const EpisodeCreate: React.FC = () => {
                                 <span id="published">Published</span>
                             </Label>
                             <Input
+                                required={true}
                                 name="pubDate"
                                 type="date"
                             />
@@ -139,12 +195,12 @@ const EpisodeCreate: React.FC = () => {
                             </Label>
 
                             <p>
-                                Example: <samp>crime, thriller, mystery, detective, maritim, radio play...</samp></p>
+                                Example: <samp>crime, thriller, mystery, detective, maritim, radio play...</samp>
+                            </p>
                             <InputTag
                                 tags={tags}
-                                handleDelete={handleDelete}
-                                handleAddition={handleAddition}
-                                onClearAll={onClearAll}
+                                setTags={setTags}
+                                name="tags"
                             />
                         </FormGroup>
                         <FormGroup>
@@ -176,6 +232,7 @@ const EpisodeCreate: React.FC = () => {
                                 <span id="author">Author</span>
                             </Label>
                             <Input
+                                required={true}
                                 name="author"
                                 type="text"
                             />
@@ -186,6 +243,7 @@ const EpisodeCreate: React.FC = () => {
                                 <span id="coverUrl">Cover Url</span>
                             </Label>
                             <Input
+                                required={true}
                                 name="coverUrl"
                                 value={coverUrl}
                                 type="text"
@@ -197,6 +255,7 @@ const EpisodeCreate: React.FC = () => {
                                 <span id="fileUrl">File URL</span>
                             </Label>
                             <Input
+                                required={true}
                                 name="fileUrl"
                                 type="text"
                                 value={fileUrl}
@@ -211,6 +270,7 @@ const EpisodeCreate: React.FC = () => {
                                 <Input
                                     name="fileLength"
                                     type="number"
+                                    value={filesize}
                                 />
                             </FormGroup>
                             <FormGroup className={"flex-fill me-2"}>
@@ -225,9 +285,17 @@ const EpisodeCreate: React.FC = () => {
                             </FormGroup>
                         </div>
 
+                        <input type="hidden" name="coverUuid" value={coverUuid}/>
+                        <input type="hidden" name="radioplayUuid" value={radioplayUuid}/>
 
-                        <Button type={"submit"} color="primary">
-                            Create
+                        {state && (
+                            <Alert color={state.success ? 'success' : 'danger'} className="mt-3">
+                                {state.message}
+                            </Alert>
+                        )}
+
+                        <Button type={"submit"} color="primary" disabled={isPending}>
+                            {isPending ? 'Submitting...' : 'Create'}
                         </Button>
                     </Form>
                 </CardBody>
@@ -238,17 +306,23 @@ const EpisodeCreate: React.FC = () => {
                     <Card className="">
                         <CardHeader><h5>Cover upload</h5></CardHeader>
                         <CardBody>
-                            {/* Pass fileMetadata as prop and receive updates via callback */}
-                            <DropUpload onFilesUploaded={handleCoverChange}/>
+                            <Suspense fallback={<div>Loading cover upload...</div>}>
+                                <ShowBucket seriesPromise={seriesData}/>
+                                <DropUpload onFilesUploaded={handleCoverChange} fileType={"cover"} bucket={bucket}/>
+                            </Suspense>
                         </CardBody>
                     </Card>
                 </Col>
 
-                <Col>
+                <Col className={"mt-2 mt-xl-0"}>
                     <Card className="">
                         <CardHeader><h5>File upload</h5></CardHeader>
                         <CardBody>
-                            <DropUpload onFilesUploaded={handleRadioplayChange}/>
+                            <Suspense fallback={<div>Loading file upload...</div>}>
+                                <ShowBucket seriesPromise={seriesData}/>
+                                <DropUpload onFilesUploaded={handleRadioplayChange} fileType={"radioplay"}
+                                            bucket={bucket}/>
+                            </Suspense>
                         </CardBody>
                     </Card>
                 </Col>
